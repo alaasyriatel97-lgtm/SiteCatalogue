@@ -1,61 +1,44 @@
-// أنواع الفلاتر بناءً على عمود Type في جدول MetaProcedureFilters
 export type FilterType = 'text' | 'number' | 'date' | 'select' | 'boolean';
-
-// أنواع مصادر البيانات للقوائم المنسدلة (DataSourceType)
 export type DataSourceType = 'static' | 'api' | 'sql_query';
 
-// ==========================================
-// 1. تمثيل جدول MetaProcedureFilters
-// ==========================================
+// 1. تعريف الفلتر الواحد
 export interface ReportFilter {
-  id: number;                 // Id
-  procedureId: number;        // ProcedureId
-  key: string;                // Key (اسم الباراميتر المرسل للباك إند)
-  label: string;              // Label (اسم الحقل الظاهر للمستخدم)
-  type: FilterType;          // Type
-  placeholder?: string;       // Placeholder
-  defaultValue?: string;      // DefaultValue
-  isRequired: boolean;        // IsRequired
-  order: number;              // Order
-
-  // للتعامل مع القوائم المنسدلة
-  dataSourceType?: DataSourceType; // DataSourceType
-  dataSourceValue?: string;        // DataSourceValue (رابط API أو القيم الثابتة)
-  parentKey?: string;              // ParentKey (للقوائم المرتبطة ببعضها)
+  id: number;
+  procedureId: number;
+  key: string;           
+  label: string;          
+  type: FilterType;
+  placeholder?: string;
+  defaultValue?: string;
+  isRequired: boolean;
+  order: number;
+  dataSourceType?: DataSourceType;  
+  dataSourceValue?: string;        
+  parentKey?: string;
 }
 
-// ==========================================
-// 2. تمثيل جدول MetaReportColumns
-// ==========================================
+// 2. تعريف العمود الواحد في الجدول
 export interface ReportColumn {
   id: number;
-  header: string;             // Header (عنوان العمود)
-  field: string;              // ColumnName (اسم الحقل في الداتا)
-  type: string;               // Type (text, date, currency, badge)
-  width?: string;             // Width
-  isSortable: boolean;        // Sortable
-  isActive: boolean;          // IsActive
+  header: string;
+  field: string;
+  type: 'text' | 'date' | 'currency' | 'status' | 'actions';
+  width?: string;
+  isSortable: boolean;
+  isActive: boolean;
 }
 
-// ==========================================
-// 3. تمثيل التقرير والتاب (دمج MetaTabs و MetaReports)
-// ==========================================
-export interface TabDefinition {
-  id: number;                 // MetaTabs.Id
-  title: string;              // MetaTabs.Name
-  procedureName: string;      // MetaProcedures.Name (اسم الإجراء المخزن لجلب الداتا)
+ export interface TabPage {
+  id: number;
+  title: string;
+  procedureName: string;  
   isActive: boolean;
-
-  // هذه المصفوفات تأتينا جاهزة من الباك إند كـ JSON متداخل
   filters: ReportFilter[];
   columns: ReportColumn[];
 }
 
-// ==========================================
-// 4. الكائن الرئيسي للصفحة (MetaTabsGroup)
-// ==========================================
-export interface PageDefinition {
-  groupId: number;            // MetaTabsGroup.Id
-  pageTitle: string;          // MetaTabsGroup.Name
-  tabs: TabDefinition[];      // قائمة التابات داخل الصفحة
+ export interface GroupTabPage {
+  groupId: number;
+  pageTitle: string;
+  tabs: TabPage[];
 }

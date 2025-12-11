@@ -8,9 +8,15 @@
   "projects": {
     "siteCatalogFe": {
       "projectType": "application",
-      "schematics": {
+      "schematics":  {
         "@schematics/angular:component": {
-          "style": "scss"
+          "type": "component",
+    "skipTests": true,
+    "style": "scss"
+        },
+        "@schematics/angular:service": {
+          "type": "service",
+          "skipTests": true
         }
       },
       "root": "",
