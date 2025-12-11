@@ -1,29 +1,32 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, delay } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { GroupTabPage } from '../models/metadata.model';
+ import { GroupTabPage } from '../models/metadata.model';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({ providedIn: 'root' })
 export class MetaService {
   private http = inject(HttpClient);
-  private apiUrl = environment.apiUrl;  
+  private apiUrl = environment.apiUrl; // تأكد أن هذا المتغير موجود في environment.ts
 
-   getGroupConfig(slug: string): Observable<GroupTabPage> {
-    //          return this.http.get<GroupTabPage>(`${this.apiUrl}/meta/${slug}`);
-    
-     return this.getMockMetadata(slug);
+  // 1. جلب تكوين الصفحة (Metadata)
+  getGroupConfig(slug: string): Observable<GroupTabPage> {
+    // ⚠️ في الوضع الحقيقي: return this.http.get<GroupTabPage>(`${this.apiUrl}/meta/${slug}`);
+
+    // ✅ حالياً: سأستخدم Mock Data لتعمل عندك فوراً بدون باك إند
+    return this.getMockMetadata(slug);
   }
 
   // 2. جلب داتا التقرير (Data)
   getReportData(procedureName: string, filters: any): Observable<any[]> {
-    //   return this.http.post<any[]>(`${this.apiUrl}/reports/${procedureName}`, filters);
-    
+    // ⚠️ في الوضع الحقيقي: return this.http.post<any[]>(`${this.apiUrl}/reports/${procedureName}`, filters);
+
     console.log(`Fetching data for [${procedureName}] with filters:`, filters);
     return this.getMockReportData();
   }
 
-   private getMockMetadata(slug: string): Observable<GroupTabPage> {
+  // --- دالة مساعدة لبيانات وهمية (للتجربة) ---
+  private getMockMetadata(slug: string): Observable<GroupTabPage> {
     const mock: GroupTabPage = {
       groupId: 1,
       pageTitle: 'دليل المواقع (Site Catalog)',
@@ -57,7 +60,7 @@ export class MetaService {
         }
       ]
     };
-    return of(mock).pipe(delay(800));  
+    return of(mock).pipe(delay(800)); // محاكاة تأخير الشبكة
   }
 
   private getMockReportData(): Observable<any[]> {

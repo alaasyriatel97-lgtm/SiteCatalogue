@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReportColumn } from 'src/app/core/models/metadata.model';
+import { ReportColumn } from '../../../core/models/metadata.model';
 
 @Component({
   selector: 'app-smart-table',
@@ -41,7 +41,7 @@ import { ReportColumn } from 'src/app/core/models/metadata.model';
                 @for (col of columns; track col.id) {
                   @if(col.isActive) {
                     <td class="px-6 py-4 whitespace-nowrap">
-                      
+
                       @if(col.type === 'status') {
                         <span [ngClass]="{
                           'bg-green-100 text-green-800': row[col.field] === 'Active',
@@ -50,12 +50,12 @@ import { ReportColumn } from 'src/app/core/models/metadata.model';
                         }" class="px-2 py-1 rounded-full text-xs font-semibold">
                           {{ row[col.field] }}
                         </span>
-                      } 
-                      
+                      }
+
                       @else if (col.type === 'date') {
                         {{ row[col.field] | date:'mediumDate' }}
-                      } 
-                      
+                      }
+
                       @else {
                         {{ row[col.field] }}
                       }

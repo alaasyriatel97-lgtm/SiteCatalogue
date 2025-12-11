@@ -1,11 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { MetaService } from 'src/app/core/services/meta.service';
-import { GroupTabPage, TabPage } from 'src/app/core/models/metadata.model';
-import { SmartFilterComponent } from 'src/app/shared/components/smart-filter/smart-filter.component';
-import { SmartTableComponent } from 'src/app/shared/components/smart-table/smart-table.component';
-import { SharedModule } from 'src/app/theme/shared/shared.module'; // لاستخدام Card Component الموجود في مشروعك
+import { SmartFilterComponent } from '../../shared/components/smart-filter/smart-filter.component';
+import { SmartTableComponent } from '../../shared/components/smart-table/smart-table.component';
+import { MetaService } from '../../core/services/meta.service';
+import { GroupTabPage, TabPage } from '../../core/models/metadata.model';
 
 @Component({
   selector: 'app-dynamic-report',
@@ -14,18 +13,18 @@ import { SharedModule } from 'src/app/theme/shared/shared.module'; // لاستخ
   template: `
     <div class="row">
       <div class="col-sm-12">
-        
+
         <app-card [headerContent]="titleTemplate" [options]="false">
           <ng-template #titleTemplate>
             <h5>{{ groupConfig()?.pageTitle || 'Loading...' }}</h5>
           </ng-template>
 
           @if (groupConfig(); as config) {
-            
+
             <ul class="nav nav-tabs mb-4 border-b border-gray-200">
               @for (tab of config.tabs; track tab.id) {
                 <li class="nav-item cursor-pointer">
-                  <a class="nav-link" 
+                  <a class="nav-link"
                      [class.active]="activeTab()?.id === tab.id"
                      [class.font-bold]="activeTab()?.id === tab.id"
                      (click)="setActiveTab(tab)">
@@ -37,16 +36,16 @@ import { SharedModule } from 'src/app/theme/shared/shared.module'; // لاستخ
 
             @if (activeTab(); as tab) {
               <div class="animate-fadeIn">
-                
+
                 @if (tab.filters.length > 0) {
-                  <app-smart-filter 
-                    [filters]="tab.filters" 
+                  <app-smart-filter
+                    [filters]="tab.filters"
                     (filterSubmit)="onSearch($event)">
                   </app-smart-filter>
                 }
 
-                <app-smart-table 
-                  [columns]="tab.columns" 
+                <app-smart-table
+                  [columns]="tab.columns"
                   [data]="tableData()"
                   [isLoading]="isTableLoading()">
                 </app-smart-table>
@@ -101,7 +100,7 @@ export class DynamicReportComponent implements OnInit {
     this.groupConfig.set(null); // Reset UI
     this.metaService.getGroupConfig(slug).subscribe(config => {
       this.groupConfig.set(config);
-      
+
       // تفعيل أول تاب تلقائياً
       if (config.tabs && config.tabs.length > 0) {
         this.setActiveTab(config.tabs[0]);
@@ -112,7 +111,7 @@ export class DynamicReportComponent implements OnInit {
   setActiveTab(tab: TabPage) {
     this.activeTab.set(tab);
     this.tableData.set([]); // تصفير الجدول القديم
-    
+
     // إذا لم يكن هناك فلاتر، حمل البيانات مباشرة
     if (!tab.filters || tab.filters.length === 0) {
       this.fetchData(tab.procedureName, {});
