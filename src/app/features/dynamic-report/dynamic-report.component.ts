@@ -5,6 +5,7 @@ import { SmartFilterComponent } from '../../shared/components/smart-filter/smart
 import { SmartTableComponent } from '../../shared/components/smart-table/smart-table.component';
 import { MetaService } from '../../core/services/meta.service';
 import { GroupTabPage, TabPage } from '../../core/models/metadata.model';
+import { SharedModule } from '../../theme/shared/shared.module';
 
 @Component({
   selector: 'app-dynamic-report',

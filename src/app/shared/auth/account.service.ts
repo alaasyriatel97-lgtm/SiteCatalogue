@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, finalize, map, of, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
+
 import { TokenDto } from './models/account';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
