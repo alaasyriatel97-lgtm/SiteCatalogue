@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { BreadcrumbComponent } from 'src/app/theme/shared/components/breadcrumb/breadcrumb.component';
+import { NavigationItem } from './navigation/navigation';
 
 @Component({
   selector: 'app-admin',
@@ -17,9 +18,12 @@ import { BreadcrumbComponent } from 'src/app/theme/shared/components/breadcrumb/
 })
 export class AdminComponent {
   // public props
-  navCollapsed: boolean;
-  navCollapsedMob: boolean;
-
+// عدلها لتصبح هكذا
+navCollapsed!: boolean;
+navCollapsedMob!: boolean;
+windowWidth: number = window.innerWidth; // يفضل إعطاء قيمة أولية
+// عدلها لتصبح هكذا
+ComponentNavigations!: NavigationItem[];
   // public method
   navMobClick() {
     if (this.navCollapsedMob && !document.querySelector('app-navigation.pc-sidebar')?.classList.contains('mob-open')) {

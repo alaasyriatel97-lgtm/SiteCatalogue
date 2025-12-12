@@ -1,24 +1,30 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+
+// 1. استيراد المكونات الصحيحة (التي تملكها بالفعل)
 import { SmartFilterComponent } from '../../shared/components/smart-filter/smart-filter.component';
 import { SmartTableComponent } from '../../shared/components/smart-table/smart-table.component';
+import { MantisCardComponent } from '../../shared/components/mantis-card/mantis-card.component'; // 👈 استيراد المكون الصحيح
+
 import { MetaService } from '../../core/services/meta.service';
 import { GroupTabPage, TabPage } from '../../core/models/metadata.model';
-import { SharedModule } from '../../theme/shared/shared.module';
 
 @Component({
   selector: 'app-dynamic-report',
   standalone: true,
-  imports: [CommonModule, SharedModule, SmartFilterComponent, SmartTableComponent],
+  // 2. إضافة MantisCardComponent إلى قائمة imports بدلاً من SharedModule المعطوب
+  imports: [
+    CommonModule,
+    MantisCardComponent,
+    SmartFilterComponent,
+    SmartTableComponent
+  ],
   template: `
     <div class="row">
       <div class="col-sm-12">
 
-        <app-card [headerContent]="titleTemplate" [options]="false">
-          <ng-template #titleTemplate>
-            <h5>{{ groupConfig()?.pageTitle || 'Loading...' }}</h5>
-          </ng-template>
+        <app-mantis-card [title]="groupConfig()?.pageTitle || 'Loading...'">
 
           @if (groupConfig(); as config) {
 
@@ -55,23 +61,29 @@ import { SharedModule } from '../../theme/shared/shared.module';
             }
 
           } @else {
-            <div class="d-flex justify-content-center p-5">
-              <div class="spinner-border text-primary" role="status"></div>
+            <div class="flex justify-center p-5">
+              <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           }
 
-        </app-card>
+        </app-mantis-card>
       </div>
     </div>
   `,
   styles: [`
+    .nav-link {
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
     .nav-link.active {
-      color: #0d6efd;
-      border-bottom: 2px solid #0d6efd;
-      background: transparent;
+      color: #2563eb; /* Blue-600 */
+      border-bottom-color: #2563eb;
+      font-weight: 600;
     }
     .animate-fadeIn {
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn 0.4s ease-in-out;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
@@ -83,37 +95,35 @@ export class DynamicReportComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private metaService = inject(MetaService);
 
-  // State Signals (أفضل ممارسة في Angular 17+)
+  // State Signals
   groupConfig = signal<GroupTabPage | null>(null);
   activeTab = signal<TabPage | null>(null);
   tableData = signal<any[]>([]);
   isTableLoading = signal<boolean>(false);
 
   ngOnInit() {
-    // الاستماع لتغيير الرابط
     this.route.params.subscribe(params => {
-      const slug = params['slug']; // e.g., 'sites-catalog'
-      this.loadGroupConfig(slug);
+      const slug = params['slug'];
+      if (slug) this.loadGroupConfig(slug);
     });
   }
 
   loadGroupConfig(slug: string) {
-    this.groupConfig.set(null); // Reset UI
-    this.metaService.getGroupConfig(slug).subscribe(config => {
-      this.groupConfig.set(config);
-
-      // تفعيل أول تاب تلقائياً
-      if (config.tabs && config.tabs.length > 0) {
-        this.setActiveTab(config.tabs[0]);
-      }
+    this.groupConfig.set(null);
+    this.metaService.getGroupConfig(slug).subscribe({
+      next: (config) => {
+        this.groupConfig.set(config);
+        if (config.tabs && config.tabs.length > 0) {
+          this.setActiveTab(config.tabs[0]);
+        }
+      },
+      error: (err) => console.error('Failed to load config', err)
     });
   }
 
   setActiveTab(tab: TabPage) {
     this.activeTab.set(tab);
-    this.tableData.set([]); // تصفير الجدول القديم
-
-    // إذا لم يكن هناك فلاتر، حمل البيانات مباشرة
+    this.tableData.set([]);
     if (!tab.filters || tab.filters.length === 0) {
       this.fetchData(tab.procedureName, {});
     }
