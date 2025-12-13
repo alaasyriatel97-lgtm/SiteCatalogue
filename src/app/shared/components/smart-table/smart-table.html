@@ -1,0 +1,142 @@
+<div class="smart-table-container">
+  
+    <!-- Loading Overlay -->
+    @if (isLoading) {
+      <div class="loading-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+  
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="paginatedData()" class="data-table">
+        
+        <!-- Dynamic Columns -->
+        @for (column of columns; track column.id) {
+          @if (column.isActive) {
+            <ng-container [matColumnDef]="column.field">
+              
+              <!-- Header -->
+              <th mat-header-cell *matHeaderCellDef class="table-header">
+                <div class="header-content">
+                  <span>{{ column.header }}</span>
+                  @if (column.isSortable) {
+                    <button 
+                      mat-icon-button 
+                      (click)="onSort(column)"
+                      class="sort-button"
+                    >
+                      <mat-icon class="sort-icon">
+                        {{ getSortIcon(column.field) }}
+                      </mat-icon>
+                    </button>
+                  }
+                </div>
+              </th>
+              
+              <!-- Cell -->
+              <td mat-cell *matCellDef="let row" class="table-cell">
+                
+                @switch (column.type) {
+                  
+                  <!-- Text -->
+                  @case ('text') {
+                    <span>{{ row[column.field] || '-' }}</span>
+                  }
+                  
+                  <!-- Date -->
+                  @case ('date') {
+                    <div class="date-cell">
+                      <mat-icon class="cell-icon">event</mat-icon>
+                      <span>{{ formatDate(row[column.field]) }}</span>
+                    </div>
+                  }
+                  
+                  <!-- Currency -->
+                  @case ('currency') {
+                    <span class="currency-cell">
+                      {{ formatCurrency(row[column.field]) }}
+                    </span>
+                  }
+                  
+                  <!-- Status -->
+                  @case ('status') {
+                    <span 
+                      class="status-badge"
+                      [ngClass]="getStatusClass(row[column.field])"
+                    >
+                      <span class="status-dot"></span>
+                      {{ row[column.field] }}
+                    </span>
+                  }
+                  
+                  <!-- Actions -->
+                  @case ('actions') {
+                    <div class="action-buttons">
+                      <button 
+                        mat-icon-button 
+                        (click)="actionClick.emit({ action: 'view', row: row })"
+                        matTooltip="عرض"
+                      >
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                      <button 
+                        mat-icon-button 
+                        (click)="actionClick.emit({ action: 'edit', row: row })"
+                        matTooltip="تعديل"
+                      >
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button 
+                        mat-icon-button 
+                        color="warn"
+                        (click)="actionClick.emit({ action: 'delete', row: row })"
+                        matTooltip="حذف"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  }
+                  
+                }
+              </td>
+              
+            </ng-container>
+          }
+        }
+  
+        <!-- Table Rows -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr 
+          mat-row 
+          *matRowDef="let row; columns: displayedColumns()"
+          class="table-row"
+          (click)="onRowClick(row)"
+        ></tr>
+  
+        <!-- No Data Row -->
+        @if (paginatedData().length === 0 && !isLoading) {
+          <tr class="no-data-row">
+            <td [attr.colspan]="displayedColumns().length" class="no-data-cell">
+              <div class="no-data-content">
+                <mat-icon>inbox</mat-icon>
+                <p>لا توجد بيانات للعرض</p>
+              </div>
+            </td>
+          </tr>
+        }
+  
+      </table>
+    </div>
+  
+    <!-- Paginator -->
+    <mat-paginator
+      [length]="sortedData().length"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25, 50, 100]"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)"
+      class="table-paginator"
+    ></mat-paginator>
+  
+  </div>

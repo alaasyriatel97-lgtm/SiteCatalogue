@@ -6,17 +6,11 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "siteCatalogFe": {
+    "SiteCatalogue": {
       "projectType": "application",
-      "schematics":  {
+      "schematics": {
         "@schematics/angular:component": {
-          "type": "component",
-    "skipTests": true,
-    "style": "scss"
-        },
-        "@schematics/angular:service": {
-          "type": "service",
-          "skipTests": true
+          "style": "scss"
         }
       },
       "root": "",
@@ -67,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "siteCatalogFe:build:production"
+              "buildTarget": "SiteCatalogue:build:production"
             },
             "development": {
-              "buildTarget": "siteCatalogFe:build:development"
+              "buildTarget": "SiteCatalogue:build:development"
             }
           },
           "defaultConfiguration": "development"

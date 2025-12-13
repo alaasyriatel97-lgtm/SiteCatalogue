@@ -1,0 +1,118 @@
+<div class="unauthorized-container">
+  
+    <!-- Background Decorations -->
+    <div class="background-decoration">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+  
+    <!-- Main Content -->
+    <div class="content-wrapper">
+      
+      <!-- Error Card -->
+      <mat-card class="error-card">
+        
+        <!-- Lock Icon Animation -->
+        <div class="icon-container">
+          <div class="icon-glow"></div>
+          <div class="lock-icon">
+            <mat-icon>lock</mat-icon>
+          </div>
+        </div>
+  
+        <!-- Error Code -->
+        <div class="error-code">
+          <h1>403</h1>
+          <div class="divider"></div>
+        </div>
+  
+        <!-- Error Message -->
+        <mat-card-content class="error-content">
+          <h2>وصول غير مصرح به</h2>
+          <p class="main-message">
+            عذراً، ليس لديك الصلاحيات الكافية للوصول إلى هذه الصفحة.
+          </p>
+          <p class="sub-message">
+            يرجى تسجيل الدخول بحساب له الصلاحيات المطلوبة أو التواصل مع المسؤول.
+          </p>
+        </mat-card-content>
+  
+        <!-- Reasons Box -->
+        <div class="reasons-box">
+          <div class="reasons-header">
+            <mat-icon>info</mat-icon>
+            <span>الأسباب المحتملة:</span>
+          </div>
+          <ul class="reasons-list">
+            <li>
+              <mat-icon>chevron_left</mat-icon>
+              <span>انتهت صلاحية جلسة العمل الخاصة بك</span>
+            </li>
+            <li>
+              <mat-icon>chevron_left</mat-icon>
+              <span>ليس لديك الصلاحيات اللازمة للوصول</span>
+            </li>
+            <li>
+              <mat-icon>chevron_left</mat-icon>
+              <span>تم حظر الوصول من قبل المسؤول</span>
+            </li>
+            <li>
+              <mat-icon>chevron_left</mat-icon>
+              <span>الصفحة المطلوبة غير متاحة لدورك الحالي</span>
+            </li>
+          </ul>
+        </div>
+  
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="goToLogin()"
+            class="primary-button"
+          >
+            <mat-icon>login</mat-icon>
+            <span>تسجيل الدخول</span>
+          </button>
+  
+          <button 
+            mat-raised-button
+            (click)="goToHome()"
+            class="secondary-button"
+          >
+            <mat-icon>home</mat-icon>
+            <span>الصفحة الرئيسية</span>
+          </button>
+  
+          <button 
+            mat-stroked-button
+            (click)="goBack()"
+            class="tertiary-button"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            <span>العودة للخلف</span>
+          </button>
+        </div>
+  
+        <!-- Help Section -->
+        <div class="help-section">
+          <mat-icon>help_outline</mat-icon>
+          <p>
+            هل تحتاج مساعدة؟ 
+            <a href="mailto:support@darzaibak.com" class="help-link">
+              تواصل مع الدعم الفني
+            </a>
+          </p>
+        </div>
+  
+      </mat-card>
+  
+      <!-- Footer -->
+      <div class="footer">
+        <p>© 2024 Syriatel Mobile Telecom. All rights reserved.</p>
+      </div>
+  
+    </div>
+  
+  </div>

@@ -6,8 +6,8 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrls: ['./app.scss']
+  styleUrl: './app.scss'
 })
-export class App { 
-  title = signal('siteCatalogFe');
+export class App {
+  title = 'Site Catalog System';
 }

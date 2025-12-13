@@ -1,36 +1,52 @@
 import { Routes } from '@angular/router';
-import { MainLayoutComponent } from './core/layout/main-layout/main-layout.component';
-import { authGuard } from './shared/auth/auth.guard'; // 👈 هذا السطر كان ناقصاً
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  {
-    path: '',
-    component: MainLayoutComponent,
-    children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    // Public Routes
+    {
+        path: 'login',
+        loadComponent: () =>
+            import('./features/auth/login/login')
+                .then(m => m.Login)
+    },
+    {
+        path: 'unauthorized',
+        loadComponent: () =>
+            import('./features/auth/unauthorized/unauthorized')
+                .then(m => m.Unauthorized)
+    },
 
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent)
-      },
+    // Protected Routes
+    {
+        path: '',
+        loadComponent: () =>
+            import('./core/layout/main-layout/main-layout')
+                .then(m => m.MainLayout),
+        // canActivate: [authGuard],
+        children: [
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            },
+            {
+                path: 'dashboard',
+                loadComponent: () =>
+                    import('./features/dashboard/dashboard')
+                        .then(m => m.Dashboard)
+            },
+            {
+                path: 'reports/:slug',
+                loadComponent: () =>
+                    import('./features/reports/dynamic-report/dynamic-report')
+                        .then(m => m.DynamicReport)
+            }
+        ]
+    },
 
-      // هذا هو الرابط الصحيح (احذف المكرر)
-      {
-        path: 'reports/:slug',
-        loadComponent: () => import('./features/dynamic-report/dynamic-report.component')
-          .then(m => m.DynamicReportComponent),
-        canActivate: [authGuard] // الآن سيعمل لأننا قمنا بعمل Import
-      }
-    ]
-  },
-
-  // أضف صفحة تسجيل الدخول وإلا سيدخل الـ Guard في حلقة لا نهائية
-  {
-     path: 'login',
-     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
-  },
-  {
-     path: 'unauthorized',
-     loadComponent: () => import('./features/auth/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent)
-  }
+    // Fallback
+    {
+        path: '**',
+        redirectTo: 'dashboard'
+    }
 ];

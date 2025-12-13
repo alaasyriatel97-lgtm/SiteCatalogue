@@ -1,0 +1,80 @@
+<div class="h-screen flex flex-col">
+    <mat-toolbar class="toolbar">
+      <button mat-icon-button (click)="toggleSidebar()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      
+      <span class="toolbar-title">Syriatel Mobile Telecom</span>
+      
+      <span class="spacer"></span>
+      
+      <button mat-icon-button>
+        <mat-icon>search</mat-icon>
+      </button>
+      
+      <button mat-icon-button [matBadge]="3" matBadgeColor="warn">
+        <mat-icon>notifications</mat-icon>
+      </button>
+      
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+        <div class="user-avatar">{{ currentUser()?.userName?.charAt(0) || 'U' }}</div>
+        <span class="hidden md:inline">{{ currentUser()?.userName }}</span>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+    </mat-toolbar>
+  
+    <mat-sidenav-container class="flex-1">
+      <mat-sidenav 
+        [mode]="isMobile() ? 'over' : 'side'"
+        [opened]="isSidebarOpen()"
+        class="sidebar"
+      >
+        <div class="sidebar-header">
+          <div class="logo">SYR</div>
+          <div class="logo-text">
+            <h3>Syriatel Mobile Telecom</h3>
+            <p>Site Catalog</p>
+          </div>
+        </div>
+  
+        <mat-nav-list>
+          @for (item of menuItems; track item.route) {
+            @if (hasRole(item.roles)) {
+              <a 
+                mat-list-item 
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                class="nav-item"
+              >
+                <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+                <span matListItemTitle>{{ item.label }}</span>
+              </a>
+            }
+          }
+        </mat-nav-list>
+      </mat-sidenav>
+  
+      <mat-sidenav-content class="content">
+        <div class="content-wrapper">
+          <router-outlet></router-outlet>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
+  
+  <!-- User Menu -->
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item>
+      <mat-icon>person</mat-icon>
+      <span>الملف الشخصي</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>settings</mat-icon>
+      <span>الإعدادات</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>تسجيل الخروج</span>
+    </button>
+  </mat-menu>

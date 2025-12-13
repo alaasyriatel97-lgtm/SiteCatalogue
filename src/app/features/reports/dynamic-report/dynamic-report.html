@@ -1,0 +1,165 @@
+<div class="dynamic-report">
+  
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="60"></mat-spinner>
+        <p>جاري تحميل التقرير...</p>
+      </div>
+    }
+  
+    <!-- Error State -->
+    @else if (error()) {
+      <mat-card class="error-card">
+        <mat-card-content>
+          <div class="error-content">
+            <mat-icon class="error-icon">error_outline</mat-icon>
+            <h3>خطأ في تحميل التقرير</h3>
+            <p>{{ error() }}</p>
+            <button mat-raised-button color="warn" (click)="retry()">
+              <mat-icon>refresh</mat-icon>
+              إعادة المحاولة
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  
+    <!-- Report Content -->
+    @else if (groupConfig(); as config) {
+      
+      <!-- Page Header -->
+      <mat-card class="header-card">
+        <mat-card-content>
+          <div class="header-content">
+            <div class="header-text">
+              <h1>{{ pageTitle() }}</h1>
+              <p>تقرير ديناميكي متقدم</p>
+            </div>
+            <div class="header-actions">
+              <button 
+                mat-icon-button 
+                (click)="exportData()"
+                [disabled]="!hasData()"
+                matTooltip="تصدير البيانات"
+              >
+                <mat-icon>download</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                (click)="refreshData()"
+                matTooltip="تحديث البيانات"
+              >
+                <mat-icon>refresh</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Tabs -->
+      @if (config.tabs.length > 1) {
+        <mat-card class="tabs-card">
+          <mat-tab-group 
+            [(selectedIndex)]="selectedTabIndex"
+            (selectedIndexChange)="onTabChange($event)"
+            animationDuration="300ms"
+          >
+            @for (tab of config.tabs; track tab.id) {
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <div class="tab-label">
+                    <span>{{ tab.title }}</span>
+                    @if (tab.id === activeTab()?.id && hasData()) {
+                      <span class="badge">{{ tableData().length }}</span>
+                    }
+                  </div>
+                </ng-template>
+              </mat-tab>
+            }
+          </mat-tab-group>
+        </mat-card>
+      }
+  
+      <!-- Tab Content -->
+      @if (activeTab(); as tab) {
+        <div class="tab-content">
+          
+          <!-- Filters Section -->
+          @if (hasFilters()) {
+            <mat-card class="filters-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>filter_list</mat-icon>
+                  فلاتر البحث
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <app-smart-filter
+                [filters]="tab.filters"
+                (filterSubmit)="onSearch($event)"
+                (filterReset)="refreshData()"
+              ></app-smart-filter>
+              </mat-card-content>
+            </mat-card>
+          }
+  
+          <!-- Results Summary -->
+          @if (hasData() || isTableLoading()) {
+            <div class="results-summary">
+              <div class="summary-content">
+                <mat-icon>description</mat-icon>
+                <div>
+                  <p class="label">إجمالي النتائج</p>
+                  <p class="value">{{ tableData().length }} سجل</p>
+                </div>
+              </div>
+              @if (lastUpdateTime()) {
+                <p class="update-time">
+                  آخر تحديث: {{ lastUpdateTime() | date:'short' }}
+                </p>
+              }
+            </div>
+          }
+  
+          <!-- Data Table -->
+          <mat-card class="table-card">
+            <mat-card-header>
+              <mat-card-title>{{ tab.title }}</mat-card-title>
+              @if (isTableLoading()) {
+                <div class="loading-indicator">
+                  <mat-spinner diameter="20"></mat-spinner>
+                  <span>جاري التحميل...</span>
+                </div>
+              }
+            </mat-card-header>
+            <mat-card-content>
+               <app-smart-table
+  [columns]="tab.columns"
+  [data]="tableData()"
+  [isLoading]="isTableLoading()"
+  (rowClick)="onRowClick($event)"
+  (actionClick)="onActionClick($event)"
+></app-smart-table>
+  
+              <!-- Empty State -->
+              @if (!isTableLoading() && !hasData()) {
+                <div class="empty-state">
+                  <mat-icon>search_off</mat-icon>
+                  <h3>لا توجد بيانات</h3>
+                  <p>لم يتم العثور على أي سجلات. استخدم الفلاتر للبحث.</p>
+                  <button mat-raised-button color="primary" (click)="refreshData()">
+                    <mat-icon>refresh</mat-icon>
+                    تحميل البيانات
+                  </button>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+  
+        </div>
+      }
+  
+    }
+  
+  </div>
