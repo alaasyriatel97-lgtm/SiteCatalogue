@@ -1,22 +1,12 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatBadgeModule } from '@angular/material/badge';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AuthService } from '../../services/auth.service';
-
-interface MenuItem {
-  label: string;
-  icon: string;
-  route: string;
-  roles?: string[];
-}
+import { MetaService } from '../../services/meta.service';
+import { MenuItem } from '../../models/metadata.model';
 
 @Component({
   selector: 'app-main-layout',
@@ -24,19 +14,16 @@ interface MenuItem {
   imports: [
     CommonModule,
     RouterModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatListModule,
     MatIconModule,
-    MatButtonModule,
-    MatMenuModule,
-    MatBadgeModule
+    MatMenuModule
+    // تمت إزالة MatDividerModule واستخدام HTML عادي بدلاً منه
   ],
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.scss']
 })
-export class MainLayout {
+export class MainLayout implements OnInit {
   private authService = inject(AuthService);
+  private metaService = inject(MetaService);
   private router = inject(Router);
   private breakpointObserver = inject(BreakpointObserver);
 
@@ -45,20 +32,62 @@ export class MainLayout {
   isMobile = signal(false);
   currentUser = computed(() => this.authService.getCurrentUser());
 
-  menuItems: MenuItem[] = [
-    { label: 'الرئيسية', icon: 'dashboard', route: '/dashboard' },
-    { label: 'المبيعات', icon: 'shopping_cart', route: '/reports/sales' },
-    { label: 'المخزون', icon: 'inventory_2', route: '/reports/inventory' },
-    { label: 'دليل المواقع', icon: 'location_on', route: '/reports/sites' },
-    { label: 'الإعدادات', icon: 'settings', route: '/settings', roles: ['Admin'] }
-  ];
+  // القائمة كـ Signal
+  menuItems = signal<MenuItem[]>([]);
+  
+  // متغير لتتبع أي قائمة مفتوحة حالياً
+  expandedItem = signal<string | null>(null);
 
   constructor() {
-    // Detect mobile
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
       this.isMobile.set(result.matches);
       this.isSidebarOpen.set(!result.matches);
     });
+  }
+
+  ngOnInit() {
+    this.loadMenu();
+  }
+
+  loadMenu() {
+    const staticItems: MenuItem[] = [
+      { label: 'الرئيسية', icon: 'dashboard', route: '/dashboard' }
+    ];
+
+    this.metaService.getMenuItems().subscribe({
+      next: (groups: any[]) => {
+        
+        const dynamicItems: MenuItem[] = groups.map(group => ({
+          label: group.pageTitle,
+          icon: group.icon || 'folder',
+          route: undefined, 
+          children: group.tabs.map((tab: any) => ({
+            label: tab.title,
+            icon: 'circle',
+            // التصحيح: الرابط هو المسار فقط (بدون ؟ وبدون بارامترات)
+            route: `/reports/${group.slug}`, 
+            // التصحيح: البارامترات توضع هنا ككائن منفصل
+            queryParams: { tabId: tab.id }, 
+            roles: []
+          }))
+        }));
+
+        this.menuItems.set([...staticItems, ...dynamicItems]);
+      },
+      error: (err) => console.error('Error loading menu:', err)
+    });
+  }
+
+  toggleSubmenu(label: string): void {
+    if (this.expandedItem() === label) {
+      this.expandedItem.set(null);
+    } else {
+      this.expandedItem.set(label);
+    }
+  }
+
+  isExpanded(label: string): boolean {
+    return this.expandedItem() === label;
   }
 
   toggleSidebar(): void {

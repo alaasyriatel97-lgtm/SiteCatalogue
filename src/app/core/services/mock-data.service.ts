@@ -5,17 +5,18 @@ import { GroupTabPage, TabPage, ReportFilter, ReportColumn } from '../models/met
 @Injectable({
   providedIn: 'root'
 })
-export class MockDataService  {
-  
+export class MockDataService {
+
   /**
    * قاعدة بيانات الـ Metadata الوهمية
    */
   private mockPages: { [key: string]: GroupTabPage } = {
-    
+
     // تقرير المبيعات
     'sales': {
-      groupId: 1,
+      groupId: 1,slug: 'sales',
       pageTitle: 'تقارير fdgdfg والإيرادات',
+      icon: 'shopping_cart',
       tabs: [
         {
           id: 101,
@@ -127,8 +128,9 @@ export class MockDataService  {
       ]
     },
     'sss': {
-      groupId: 1,
+      groupId: 1,slug: 'sss',
       pageTitle: 'تقارير المبيعات والإيرادات',
+      icon: 'inventory_2',
       tabs: [
         {
           id: 101,
@@ -242,7 +244,7 @@ export class MockDataService  {
 
     // تقرير المخزون
     'inventory': {
-      groupId: 2,
+      groupId: 2, icon: 'location_on',slug: 'inventory',
       pageTitle: 'إدارة المخزون',
       tabs: [
         {
@@ -310,8 +312,8 @@ export class MockDataService  {
 
     // دليل المواقع
     'sites': {
-      groupId: 3,
-      pageTitle: 'دليل المواقع (Site Catalog)',
+      groupId: 3,slug: 'sites',
+      pageTitle: 'دليل المواقع (Site Catalog)', icon: 'location_on',
       tabs: [
         {
           id: 301,
@@ -532,5 +534,18 @@ export class MockDataService  {
       closureDate: new Date(2022, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
       reason: reasons[Math.floor(Math.random() * reasons.length)]
     }));
+  }
+
+  getMenuItems(): Observable<any[]> {
+    const items = Object.keys(this.mockPages).map(slug => {
+      const page = this.mockPages[slug];
+      return {
+        label: page.pageTitle,
+        icon: page.icon || 'folder', 
+        route: `/reports/${slug}`,
+        roles: []  
+      };
+    });
+    return of(Object.values(this.mockPages));
   }
 }

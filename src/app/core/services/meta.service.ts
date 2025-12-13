@@ -42,4 +42,11 @@ export class MetaService {
     this.useMockData = useMock;
     console.log(`🔄 Mock Mode: ${useMock ? 'ENABLED' : 'DISABLED'}`);
   }
+  getMenuItems(): Observable<any[]> {
+    if (this.useMockData) {
+      return this.mockDataService.getMenuItems();
+    }
+    // في حال وجود API حقيقي:
+    return this.http.get<any[]>(`${environment.apiUrl}/menu`);
+  }
 }

@@ -39,5 +39,15 @@ export interface TabPage {
 export interface GroupTabPage {
   groupId: number;
   pageTitle: string;
+  slug: string;  
+  icon?: string;
   tabs: TabPage[];
+}
+export interface MenuItem {
+  label: string;
+  icon: string;
+  route?: string; 
+  queryParams?: any;  
+  roles?: string[];
+  children?: MenuItem[];
 }

@@ -1,80 +1,169 @@
-<div class="h-screen flex flex-col">
-    <mat-toolbar class="toolbar">
-      <button mat-icon-button (click)="toggleSidebar()">
-        <mat-icon>menu</mat-icon>
-      </button>
-      
-      <span class="toolbar-title">Syriatel Mobile Telecom</span>
-      
-      <span class="spacer"></span>
-      
-      <button mat-icon-button>
-        <mat-icon>search</mat-icon>
-      </button>
-      
-      <button mat-icon-button [matBadge]="3" matBadgeColor="warn">
-        <mat-icon>notifications</mat-icon>
-      </button>
-      
-      <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
-        <div class="user-avatar">{{ currentUser()?.userName?.charAt(0) || 'U' }}</div>
-        <span class="hidden md:inline">{{ currentUser()?.userName }}</span>
-        <mat-icon>arrow_drop_down</mat-icon>
-      </button>
-    </mat-toolbar>
+<div class="bg-gray-100 text-body min-h-screen font-satoshi">
   
-    <mat-sidenav-container class="flex-1">
-      <mat-sidenav 
-        [mode]="isMobile() ? 'over' : 'side'"
-        [opened]="isSidebarOpen()"
-        class="sidebar"
-      >
-        <div class="sidebar-header">
-          <div class="logo">SYR</div>
-          <div class="logo-text">
-            <h3>Syriatel Mobile Telecom</h3>
-            <p>Site Catalog</p>
+  <div class="flex h-screen overflow-hidden">
+    
+    <aside
+      class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-white border-r border-stroke duration-300 ease-linear lg:static lg:translate-x-0"
+      [class.translate-x-0]="isSidebarOpen()"
+      [class.-translate-x-full]="!isSidebarOpen() && isMobile()"
+      [class.hidden]="!isSidebarOpen() && !isMobile()"
+    >
+      <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+        <a href="/" class="flex items-center gap-2">
+           <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white font-bold">SYR</div>
+           <span class="text-xl font-bold text-black">Syriatel</span>
+        </a>
+        
+        <button class="block lg:hidden" (click)="toggleSidebar()">
+          <mat-icon class="text-black">arrow_back</mat-icon>
+        </button>
+      </div>
+
+      <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+        <nav class="mt-5 py-4 px-4 lg:mt-9 lg:px-6">
+          <div>
+            <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">القائمة الرئيسية</h3>
+            
+            <ul class="mb-6 flex flex-col gap-1.5">
+  
+              @for (item of menuItems(); track item.label) {
+                
+                @if (!item.children || item.children.length === 0) {
+                  <li>
+                    <a
+                      [routerLink]="item.route"
+                      routerLinkActive="bg-primary text-white"
+                      class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-gray-100 text-black dark:text-white dark:hover:bg-meta-4"
+                    >
+                      <mat-icon class="text-xl">{{ item.icon }}</mat-icon>
+                      <span>{{ item.label }}</span>
+                    </a>
+                  </li>
+                }
+            
+                @else {
+                  <li>
+                    <a
+                      href="javascript:void(0)"
+                      class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-gray-100 text-black dark:text-white dark:hover:bg-meta-4"
+                      [class.bg-gray-100]="isExpanded(item.label)"
+                      (click)="toggleSubmenu(item.label)"
+                    >
+                      <mat-icon class="text-xl">{{ item.icon }}</mat-icon>
+                      <span>{{ item.label }}</span>
+                      
+                      <mat-icon 
+                        class="absolute left-4 top-1/2 -translate-y-1/2 fill-current text-xl transition-transform duration-300"
+                        [class.rotate-180]="isExpanded(item.label)"
+                      >
+                        keyboard_arrow_down
+                      </mat-icon>
+                    </a>
+            
+                    <div class="overflow-hidden transition-all duration-300" 
+                         [class.hidden]="!isExpanded(item.label)">
+                      <ul class="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6 pr-4">
+                        @for (child of item.children; track child.label) {
+                          <li>
+                            <a
+                              [routerLink]="child.route"
+                              [queryParams]="child.queryParams" 
+                              routerLinkActive="text-primary"
+                              class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out hover:text-primary text-body"
+                            >
+                              <span class="h-2 w-2 rounded-full border border-current opacity-70"></span>
+                              {{ child.label }}
+                            </a>
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  </li>
+                }
+              }
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+      
+      <header class="sticky top-0 z-999 flex w-full bg-white drop-shadow-1">
+        <div class="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
+          
+          <div class="flex items-center gap-2 sm:gap-4 lg:hidden">
+            <button
+              class="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm"
+              (click)="toggleSidebar()"
+            >
+              <mat-icon>menu</mat-icon>
+            </button>
+          </div>
+
+          <div class="hidden sm:block">
+            <div class="relative">
+              <button class="absolute left-0 top-1/2 -translate-y-1/2">
+                  <mat-icon class="text-bodydark2">search</mat-icon>
+              </button>
+              <input
+                type="text"
+                placeholder="بحث..."
+                class="w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none xl:w-125 text-black"
+              />
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 2xsm:gap-7">
+            <ul class="flex items-center gap-2 2xsm:gap-4">
+               <li class="relative">
+                 <button class="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary">
+                    <mat-icon class="text-current text-xl">notifications_none</mat-icon>
+                    <span class="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-500"></span>
+                 </button>
+               </li>
+            </ul>
+
+            <div class="relative">
+              <button [matMenuTriggerFor]="userMenu" class="flex items-center gap-4">
+                <span class="hidden text-right lg:block">
+                  <span class="block text-sm font-medium text-black">{{ currentUser()?.userName }}</span>
+                  <span class="block text-xs font-medium">UX Designer</span>
+                </span>
+                <span class="h-12 w-12 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center text-lg">
+                  {{ currentUser()?.userName?.charAt(0) || 'U' }}
+                </span>
+                <mat-icon class="hidden sm:block text-black">keyboard_arrow_down</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
-  
-        <mat-nav-list>
-          @for (item of menuItems; track item.route) {
-            @if (hasRole(item.roles)) {
-              <a 
-                mat-list-item 
-                [routerLink]="item.route"
-                routerLinkActive="active"
-                class="nav-item"
-              >
-                <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-                <span matListItemTitle>{{ item.label }}</span>
-              </a>
-            }
-          }
-        </mat-nav-list>
-      </mat-sidenav>
-  
-      <mat-sidenav-content class="content">
-        <div class="content-wrapper">
+      </header>
+
+      <main>
+        <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
           <router-outlet></router-outlet>
         </div>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+      </main>
+      
+    </div>
   </div>
+</div>
+
+<mat-menu #userMenu="matMenu" xPosition="before">
+  <button mat-menu-item>
+    <mat-icon>person</mat-icon>
+    <span>الملف الشخصي</span>
+  </button>
+  <button mat-menu-item>
+    <mat-icon>settings</mat-icon>
+    <span>الإعدادات</span>
+  </button>
   
-  <!-- User Menu -->
-  <mat-menu #userMenu="matMenu">
-    <button mat-menu-item>
-      <mat-icon>person</mat-icon>
-      <span>الملف الشخصي</span>
-    </button>
-    <button mat-menu-item>
-      <mat-icon>settings</mat-icon>
-      <span>الإعدادات</span>
-    </button>
-    <mat-divider></mat-divider>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>exit_to_app</mat-icon>
-      <span>تسجيل الخروج</span>
-    </button>
-  </mat-menu>
+  <hr class="my-1 border-slate-200" />
+  
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span>تسجيل الخروج</span>
+  </button>
+</mat-menu>

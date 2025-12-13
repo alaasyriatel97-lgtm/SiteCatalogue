@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,8 +33,8 @@ import { SmartTable } from '../../../shared/components/smart-table/smart-table';
 })
 export class DynamicReport implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router); // هذا يحتاج للاستيراد في الأعلى
   private metaService = inject(MetaService);
-
   // State Signals
   groupConfig = signal<GroupTabPage | null>(null);
   activeTab = signal<TabPage | null>(null);
@@ -51,10 +51,20 @@ export class DynamicReport implements OnInit {
   hasData = computed(() => this.tableData().length > 0);
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      const slug = params['slug'];
+    // نراقب تغييرات الرابط والبارامترات معاً
+    this.route.paramMap.subscribe(params => {
+      const slug = params.get('slug');
       if (slug) {
         this.loadGroupConfig(slug);
+      }
+    });
+
+    // نراقب تغييرات الـ Query Params (لتبديل التبويب عند الضغط في القائمة)
+    this.route.queryParamMap.subscribe(queryParams => {
+      const tabId = queryParams.get('tabId');
+      // نقوم بالتبديل فقط إذا تم تحميل الكونفيج مسبقاً
+      if (this.groupConfig() && tabId) {
+        this.switchToTabById(Number(tabId));
       }
     });
   }
@@ -69,35 +79,65 @@ export class DynamicReport implements OnInit {
     this.metaService.getGroupConfig(slug).subscribe({
       next: (config) => {
         this.groupConfig.set(config);
-        if (config!.tabs && config!.tabs.length > 0) {
+        
+        // بعد تحميل الكونفيج، نتحقق هل هناك تبويب محدد في الرابط؟
+        const tabIdFromUrl = this.route.snapshot.queryParamMap.get('tabId');
+        
+        if (tabIdFromUrl) {
+          this.switchToTabById(Number(tabIdFromUrl));
+        } else if (config!.tabs && config!.tabs.length > 0) {
+          // إذا لم يوجد، نفتح الأول افتراضياً
           this.setActiveTab(config!.tabs[0], 0);
         }
+        
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('فشل في تحميل التقرير. يرجى المحاولة مرة أخرى.');
+        this.error.set('فشل في تحميل التقرير.');
         this.isLoading.set(false);
-        console.error('Error loading config:', err);
       }
     });
+  }
+
+  // دالة مساعدة للبحث عن التبويب وتفعيله
+  private switchToTabById(tabId: number): void {
+    const config = this.groupConfig();
+    if (!config) return;
+
+    const tabIndex = config.tabs.findIndex(t => t.id === tabId);
+    if (tabIndex !== -1) {
+      // إذا وجدنا التبويب، نفعله
+      // ملاحظة: نستخدم setTimeout لتجنب خطأ ExpressionChangedAfterItHasBeenChecked أحياناً
+      // ولكن هنا غالباً لا نحتاجها لأننا نستخدم Signals
+      this.setActiveTab(config.tabs[tabIndex], tabIndex);
+    }
   }
 
   /**
    * تعيين التبويب النشط
    */
   setActiveTab(tab: TabPage, index: number): void {
+    // 1. تحديث الحالة الداخلية
     this.selectedTabIndex.set(index);
     this.activeTab.set(tab);
     this.tableData.set([]);
     
-    // تحميل البيانات الافتراضية إذا لم تكن هناك فلاتر
+    // 2. تحديث الرابط في المتصفح (دون إعادة تحميل الصفحة) ليعكس التبويب الحالي
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tabId: tab.id },
+      queryParamsHandling: 'merge', // دمج مع البارامترات الموجودة
+      replaceUrl: true // استبدال الرابط في التاريخ
+    });
+
+    // 3. تحميل البيانات
     if (!tab.filters || tab.filters.length === 0) {
       this.fetchData(tab.procedureName, {});
     }
   }
 
   /**
-   * عند تغيير التبويب
+   * عند تغيير التبويب (تم حذف النسخة المكررة)
    */
   onTabChange(index: number): void {
     const config = this.groupConfig();
@@ -153,7 +193,6 @@ export class DynamicReport implements OnInit {
     const data = this.tableData();
     if (data.length > 0) {
       console.log('Exporting data...', data);
-      // هنا يمكن إضافة منطق التصدير
       alert('سيتم تصدير البيانات قريباً!');
     }
   }
@@ -167,13 +206,12 @@ export class DynamicReport implements OnInit {
       this.loadGroupConfig(slug);
     }
   }
+
   /**
    * عند النقر على صف في الجدول
    */
-   onRowClick(event: any): void {
-    console.log('تم النقر على الصف:', event);
-    // هنا يمكنك إضافة كود للتوجيه إلى صفحة التفاصيل مثلاً
-    // example: this.router.navigate(['details', event.id]);
+  onRowClick(event: any): void {
+    console.log('تم النقر على صف:', event);
   }
 
   /**
@@ -181,6 +219,5 @@ export class DynamicReport implements OnInit {
    */
   onActionClick(event: any): void {
     console.log('تم النقر على إجراء:', event);
-    // هنا يمكنك معالجة الأزرار مثل التعديل أو الحذف
   }
 }

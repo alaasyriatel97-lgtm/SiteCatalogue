@@ -1,165 +1,152 @@
-<div class="dynamic-report">
+<div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
   
-    <!-- Loading State -->
-    @if (isLoading()) {
-      <div class="loading-container">
-        <mat-spinner diameter="60"></mat-spinner>
-        <p>جاري تحميل التقرير...</p>
+  @if (isLoading()) {
+    <div class="flex h-50 flex-col items-center justify-center rounded-sm border border-stroke bg-white shadow-default">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p class="mt-4 text-body font-medium">جاري تحميل التقرير...</p>
+    </div>
+  }
+
+  @else if (error()) {
+    <div class="rounded-sm border border-stroke bg-white p-6 shadow-default">
+        <div class="flex flex-col items-center text-center">
+          <div class="mb-4 rounded-full bg-red-50 p-4 text-red-500">
+              <mat-icon class="text-4xl h-10 w-10">error_outline</mat-icon>
+          </div>
+          <h3 class="mb-2 text-xl font-bold text-black">خطأ في تحميل التقرير</h3>
+          <p class="mb-6 font-medium text-body">{{ error() }}</p>
+          <button class="flex items-center gap-2 rounded bg-primary py-2 px-6 font-medium text-white hover:bg-opacity-90" (click)="retry()">
+            <mat-icon>refresh</mat-icon>
+            إعادة المحاولة
+          </button>
+        </div>
+    </div>
+  }
+
+  @else if (groupConfig(); as config) {
+    
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-title-md2 font-bold text-black">
+          {{ pageTitle() }}
+        </h2>
+        <p class="text-sm font-medium text-body">تقرير ديناميكي متقدم</p>
       </div>
-    }
-  
-    <!-- Error State -->
-    @else if (error()) {
-      <mat-card class="error-card">
-        <mat-card-content>
-          <div class="error-content">
-            <mat-icon class="error-icon">error_outline</mat-icon>
-            <h3>خطأ في تحميل التقرير</h3>
-            <p>{{ error() }}</p>
-            <button mat-raised-button color="warn" (click)="retry()">
-              <mat-icon>refresh</mat-icon>
-              إعادة المحاولة
-            </button>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    }
-  
-    <!-- Report Content -->
-    @else if (groupConfig(); as config) {
-      
-      <!-- Page Header -->
-      <mat-card class="header-card">
-        <mat-card-content>
-          <div class="header-content">
-            <div class="header-text">
-              <h1>{{ pageTitle() }}</h1>
-              <p>تقرير ديناميكي متقدم</p>
-            </div>
-            <div class="header-actions">
-              <button 
-                mat-icon-button 
-                (click)="exportData()"
-                [disabled]="!hasData()"
-                matTooltip="تصدير البيانات"
-              >
-                <mat-icon>download</mat-icon>
-              </button>
-              <button 
-                mat-icon-button 
-                (click)="refreshData()"
-                matTooltip="تحديث البيانات"
-              >
-                <mat-icon>refresh</mat-icon>
-              </button>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-  
-      <!-- Tabs -->
-      @if (config.tabs.length > 1) {
-        <mat-card class="tabs-card">
-          <mat-tab-group 
-            [(selectedIndex)]="selectedTabIndex"
-            (selectedIndexChange)="onTabChange($event)"
-            animationDuration="300ms"
+
+      <div class="flex items-center gap-2">
+          <button 
+              class="inline-flex items-center justify-center gap-2.5 rounded-md bg-primary py-2 px-6 text-center font-medium text-white hover:bg-opacity-90 disabled:opacity-50"
+              (click)="exportData()"
+              [disabled]="!hasData()"
           >
-            @for (tab of config.tabs; track tab.id) {
-              <mat-tab>
-                <ng-template mat-tab-label>
-                  <div class="tab-label">
-                    <span>{{ tab.title }}</span>
-                    @if (tab.id === activeTab()?.id && hasData()) {
-                      <span class="badge">{{ tableData().length }}</span>
-                    }
-                  </div>
-                </ng-template>
-              </mat-tab>
-            }
-          </mat-tab-group>
-        </mat-card>
-      }
-  
-      <!-- Tab Content -->
-      @if (activeTab(); as tab) {
-        <div class="tab-content">
-          
-          <!-- Filters Section -->
-          @if (hasFilters()) {
-            <mat-card class="filters-card">
-              <mat-card-header>
-                <mat-card-title>
-                  <mat-icon>filter_list</mat-icon>
-                  فلاتر البحث
-                </mat-card-title>
-              </mat-card-header>
-              <mat-card-content>
-                <app-smart-filter
-                [filters]="tab.filters"
-                (filterSubmit)="onSearch($event)"
-                (filterReset)="refreshData()"
-              ></app-smart-filter>
-              </mat-card-content>
-            </mat-card>
-          }
-  
-          <!-- Results Summary -->
-          @if (hasData() || isTableLoading()) {
-            <div class="results-summary">
-              <div class="summary-content">
-                <mat-icon>description</mat-icon>
-                <div>
-                  <p class="label">إجمالي النتائج</p>
-                  <p class="value">{{ tableData().length }} سجل</p>
-                </div>
-              </div>
-              @if (lastUpdateTime()) {
-                <p class="update-time">
-                  آخر تحديث: {{ lastUpdateTime() | date:'short' }}
-                </p>
-              }
-            </div>
-          }
-  
-          <!-- Data Table -->
-          <mat-card class="table-card">
-            <mat-card-header>
-              <mat-card-title>{{ tab.title }}</mat-card-title>
-              @if (isTableLoading()) {
-                <div class="loading-indicator">
-                  <mat-spinner diameter="20"></mat-spinner>
-                  <span>جاري التحميل...</span>
-                </div>
-              }
-            </mat-card-header>
-            <mat-card-content>
-               <app-smart-table
-  [columns]="tab.columns"
-  [data]="tableData()"
-  [isLoading]="isTableLoading()"
-  (rowClick)="onRowClick($event)"
-  (actionClick)="onActionClick($event)"
-></app-smart-table>
-  
-              <!-- Empty State -->
-              @if (!isTableLoading() && !hasData()) {
-                <div class="empty-state">
-                  <mat-icon>search_off</mat-icon>
-                  <h3>لا توجد بيانات</h3>
-                  <p>لم يتم العثور على أي سجلات. استخدم الفلاتر للبحث.</p>
-                  <button mat-raised-button color="primary" (click)="refreshData()">
-                    <mat-icon>refresh</mat-icon>
-                    تحميل البيانات
+              <mat-icon class="text-white">download</mat-icon>
+              <span>تصدير</span>
+          </button>
+          <button 
+              class="inline-flex items-center justify-center gap-2.5 rounded-md border border-primary py-2 px-6 text-center font-medium text-primary hover:bg-opacity-90 hover:text-white hover:bg-primary transition"
+              (click)="refreshData()"
+          >
+              <mat-icon>refresh</mat-icon>
+              <span>تحديث</span>
+          </button>
+      </div>
+    </div>
+
+    <div class="rounded-sm border border-stroke bg-white shadow-default">
+      
+      @if (config.tabs.length > 1) {
+        <div class="border-b border-stroke px-4">
+          <div class="flex items-center gap-4">
+              @for (tab of config.tabs; track tab.id; let i = $index) {
+                  <button 
+                      class="relative flex items-center gap-2 py-4 px-2 font-medium transition-colors duration-300 hover:text-primary"
+                      [class.text-primary]="selectedTabIndex() === i"
+                      [class.border-b-2]="selectedTabIndex() === i"
+                      [class.border-primary]="selectedTabIndex() === i"
+                      [class.text-body]="selectedTabIndex() !== i"
+                      (click)="onTabChange(i)"
+                  >
+                      {{ tab.title }}
+                      @if (tab.id === activeTab()?.id && hasData()) {
+                          <span class="inline-flex rounded-full bg-gray-100 py-0.5 px-2 text-xs font-bold text-primary">
+                              {{ tableData().length }}
+                          </span>
+                      }
                   </button>
-                </div>
               }
-            </mat-card-content>
-          </mat-card>
-  
+          </div>
         </div>
       }
-  
-    }
-  
-  </div>
+
+      <div class="p-4 md:p-6 xl:p-9">
+          @if (activeTab(); as tab) {
+              
+              @if (hasFilters()) {
+                  <div class="mb-6 rounded-sm border border-stroke bg-gray-50 p-5">
+                      <h4 class="mb-4 flex items-center gap-2 text-lg font-semibold text-black">
+                          <mat-icon class="text-primary">filter_list</mat-icon>
+                          فلاتر البحث
+                      </h4>
+                      
+                      <app-smart-filter
+                          [filters]="tab.filters"
+                          (filterSubmit)="onSearch($event)"
+                          (filterReset)="refreshData()"
+                      ></app-smart-filter>
+                  </div>
+              }
+      
+              @if (hasData() || isTableLoading()) {
+                  <div class="mb-6 flex items-center justify-between rounded-sm border border-stroke bg-gray-50 p-4">
+                      <div class="flex items-center gap-4">
+                          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-primary shadow-sm">
+                              <mat-icon>description</mat-icon>
+                          </div>
+                          <div>
+                              <span class="block text-sm font-medium text-body">إجمالي النتائج</span>
+                              <h3 class="text-xl font-bold text-black">{{ tableData().length }}</h3>
+                          </div>
+                      </div>
+                      @if (lastUpdateTime()) {
+                          <span class="text-sm font-medium text-body">
+                              آخر تحديث: {{ lastUpdateTime() | date:'shortTime' }}
+                          </span>
+                      }
+                  </div>
+              }
+      
+              <div class="relative min-h-[200px]">
+                  @if (isTableLoading()) {
+                      <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                          <mat-spinner diameter="40"></mat-spinner>
+                      </div>
+                  }
+
+                  <app-smart-table
+                      [columns]="tab.columns"
+                      [data]="tableData()"
+                      [isLoading]="isTableLoading()"
+                      (rowClick)="onRowClick($event)"
+                      (actionClick)="onActionClick($event)"
+                  ></app-smart-table>
+      
+                  @if (!isTableLoading() && !hasData()) {
+                      <div class="flex flex-col items-center py-12 text-center">
+                          <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 text-body">
+                              <mat-icon class="text-5xl h-12 w-12">search_off</mat-icon>
+                          </div>
+                          <h3 class="text-xl font-bold text-black">لا توجد بيانات</h3>
+                          <p class="mt-2 text-body">لم يتم العثور على أي سجلات. حاول تغيير خيارات البحث.</p>
+                          <button class="mt-6 flex items-center gap-2 rounded border border-primary py-2 px-6 font-medium text-primary hover:bg-primary hover:text-white transition" (click)="refreshData()">
+                              <mat-icon>refresh</mat-icon>
+                              تحديث البيانات
+                          </button>
+                      </div>
+                  }
+              </div>
+          }
+      </div>
+    </div>
+  }
+
+</div>

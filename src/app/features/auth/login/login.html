@@ -1,107 +1,90 @@
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
-  
-    <!-- Background Decorations -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="blob blob-1"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
-    </div>
-  
-    <!-- Login Card -->
-    <mat-card class="relative w-full max-w-md bg-white/80 backdrop-blur-lg shadow-2xl">
-      <mat-card-header class="text-center pb-4">
-        <div class="logo-container mx-auto mb-4">
-          <div class="logo-icon">SYR</div>
+<div class="flex h-screen w-full items-center justify-center bg-gray-100">
+  <div class="w-full max-w-125 rounded-sm border border-stroke bg-white shadow-default">
+    <div class="w-full p-4 sm:p-12.5 xl:p-17.5">
+      
+      <div class="mb-9 text-center">
+        <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded bg-primary/10 text-primary">
+            <span class="text-2xl font-bold">SYR</span>
         </div>
-        <mat-card-title class="text-3xl font-bold gradient-text">
-          Syriatel Mobile Telecom
-        </mat-card-title>
-        <mat-card-subtitle>Site Catalog Management System</mat-card-subtitle>
-      </mat-card-header>
-  
-      <mat-card-content>
-        <!-- Error Message -->
-        @if (errorMessage()) {
-          <div class="error-alert mb-4">
-            <mat-icon>error_outline</mat-icon>
-            <span>{{ errorMessage() }}</span>
-          </div>
-        }
-  
-        <!-- Login Form -->
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
-          
-          <!-- Username -->
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>اسم المستخدم</mat-label>
-            <input 
-              matInput 
+        <h2 class="mb-2 text-2xl font-bold text-black sm:text-title-xl2">
+          تسجيل الدخول
+        </h2>
+        <p class="font-medium text-body">Syriatel Mobile Telecom</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="mb-5 flex w-full border-l-6 border-red-500 bg-red-50 px-7 py-4 shadow-md">
+            <div class="mr-5 flex h-9 w-full max-w-[36px] items-center justify-center rounded-lg bg-red-100">
+                <mat-icon class="text-red-500 text-xl">error</mat-icon>
+            </div>
+            <div class="w-full">
+                <h5 class="mb-1 text-lg font-bold text-red-500">خطأ</h5>
+                <p class="text-sm text-red-600">{{ errorMessage() }}</p>
+            </div>
+        </div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="mb-4">
+          <label class="mb-2.5 block font-medium text-black">اسم المستخدم</label>
+          <div class="relative">
+            <input
+              type="text"
               formControlName="username"
               placeholder="أدخل اسم المستخدم"
-              autocomplete="username"
-            >
-            <mat-icon matPrefix>person</mat-icon>
-            @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
-              <mat-error>اسم المستخدم مطلوب</mat-error>
-            }
-          </mat-form-field>
-  
-          <!-- Password -->
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>كلمة المرور</mat-label>
-            <input 
-              matInput 
+              class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none"
+              [class.border-red-500]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+            />
+            <span class="absolute right-4 top-4">
+               <mat-icon class="text-body text-xl">person_outline</mat-icon>
+            </span>
+          </div>
+          @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+            <span class="mt-1 text-sm text-red-500">اسم المستخدم مطلوب</span>
+          }
+        </div>
+
+        <div class="mb-6">
+          <label class="mb-2.5 block font-medium text-black">كلمة المرور</label>
+          <div class="relative">
+            <input
               [type]="hidePassword() ? 'password' : 'text'"
               formControlName="password"
               placeholder="أدخل كلمة المرور"
-              autocomplete="current-password"
-            >
-            <mat-icon matPrefix>lock</mat-icon>
-            <button 
-              mat-icon-button 
-              matSuffix 
-              type="button"
-              (click)="togglePasswordVisibility()"
-            >
-              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-            </button>
-            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-              <mat-error>كلمة المرور مطلوبة</mat-error>
-            }
-          </mat-form-field>
-  
-          <!-- Remember Me -->
-          <div class="flex items-center justify-between">
-            <mat-checkbox formControlName="rememberMe" color="primary">
-              تذكرني
-            </mat-checkbox>
-            <a routerLink="/forgot-password" class="text-blue-600 hover:underline text-sm">
-              نسيت كلمة المرور؟
-            </a>
+              class="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none"
+              [class.border-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            />
+            <span class="absolute right-4 top-4 cursor-pointer" (click)="togglePasswordVisibility()">
+               <mat-icon class="text-body text-xl">{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </span>
           </div>
-  
-          <!-- Submit Button -->
-          <button 
-            mat-raised-button 
-            color="primary"
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <span class="mt-1 text-sm text-red-500">كلمة المرور مطلوبة</span>
+          }
+        </div>
+
+        <div class="mb-5">
+          <button
             type="submit"
             [disabled]="isLoading() || loginForm.invalid"
-            class="w-full h-12 text-lg font-semibold"
+            class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90 disabled:opacity-50"
           >
             @if (isLoading()) {
-              <mat-spinner diameter="24" class="inline-block"></mat-spinner>
+                <span class="flex items-center justify-center gap-2">
+                    جاري التحميل...
+                </span>
             } @else {
-              <span class="flex items-center justify-center gap-2">
-                <mat-icon>login</mat-icon>
                 تسجيل الدخول
-              </span>
             }
           </button>
-        </form>
-      </mat-card-content>
-  
-      <mat-card-footer class="text-center pt-4 text-sm text-gray-500">
-        © 2024 Syriatel Mobile Telecom. All rights reserved.
-      </mat-card-footer>
-    </mat-card>
+        </div>
+
+        <div class="mt-6 text-center">
+          <p class="font-medium text-body">
+            نسيت كلمة المرور؟ <a routerLink="/forgot-password" class="text-primary hover:underline">استعادة الحساب</a>
+          </p>
+        </div>
+      </form>
+    </div>
   </div>
+</div>
