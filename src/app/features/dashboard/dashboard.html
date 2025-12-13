@@ -1,48 +1,48 @@
 <div class="dashboard">
-    <!-- Welcome Header -->
-    <div class="welcome-banner">
-      <h1>مرحباً بك في لوحة التحكم 👋</h1>
-      <p>إليك نظرة سريعة على أداء نظامك اليوم</p>
-    </div>
-  
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      @for (stat of stats(); track stat.title) {
-        <mat-card class="stat-card" [ngClass]="'stat-' + stat.color">
-          <mat-card-content>
-            <div class="stat-header">
-              <mat-icon>{{ stat.icon }}</mat-icon>
-              <span class="stat-change" [ngClass]="'trend-' + stat.trend">
-                <mat-icon>{{ stat.trend === 'up' ? 'trending_up' : 'trending_down' }}</mat-icon>
-                {{ stat.change }}
-              </span>
-            </div>
-            <h2 class="stat-value">{{ stat.value }}</h2>
-            <p class="stat-title">{{ stat.title }}</p>
-          </mat-card-content>
-        </mat-card>
-      }
-    </div>
-  
-    <!-- Quick Actions -->
-    <mat-card class="quick-actions-card">
-      <mat-card-header>
-        <mat-card-title>إجراءات سريعة</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="actions-grid">
-          @for (action of quickActions(); track action.title) {
-            <button 
-              mat-raised-button 
-              color="primary"
-              [routerLink]="action.route"
-              class="action-button"
-            >
-              <mat-icon>{{ action.icon }}</mat-icon>
-              <span>{{ action.title }}</span>
-            </button>
-          }
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- Welcome Header -->
+  <div class="welcome-banner">
+    <h1>مرحباً بك في لوحة التحكم 👋</h1>
+    <p>إليك نظرة سريعة على أداء نظامك اليوم</p>
   </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.title) {
+      <mat-card class="stat-card" [ngClass]="'stat-' + stat.color">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon>{{ stat.icon }}</mat-icon>
+            <span class="stat-change" [ngClass]="'trend-' + stat.trend">
+              <mat-icon>{{ stat.trend === 'up' ? 'trending_up' : 'trending_down' }}</mat-icon>
+              {{ stat.change }}
+            </span>
+          </div>
+          <h2 class="stat-value">{{ stat.value }}</h2>
+          <p class="stat-title">{{ stat.title }}</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Quick Actions -->
+  <mat-card class="quick-actions-card">
+    <mat-card-header>
+      <mat-card-title>إجراءات سريعة</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="actions-grid">
+        @for (action of quickActions(); track action.title) {
+          <button 
+            mat-raised-button 
+            color="primary"
+            [routerLink]="action.route"
+            class="action-button"
+          >
+            <mat-icon>{{ action.icon }}</mat-icon>
+            <span>{{ action.title }}</span>
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
