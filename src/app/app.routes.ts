@@ -22,7 +22,11 @@ export const routes: Routes = [
         loadComponent: () =>
             import('./core/layout/main-layout/main-layout')
                 .then(m => m.MainLayout),
+<<<<<<< HEAD
   canActivate: [authGuard],
+=======
+        // canActivate: [authGuard],
+>>>>>>> 40e60079cf48c0e625aeb7cd2d5fbe4c24e1c129
         children: [
             {
                 path: '',
@@ -49,4 +53,8 @@ export const routes: Routes = [
         path: '**',
         redirectTo: 'dashboard'
     }
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> 40e60079cf48c0e625aeb7cd2d5fbe4c24e1c129
