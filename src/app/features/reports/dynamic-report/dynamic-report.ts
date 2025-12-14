@@ -1,12 +1,12 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { combineLatest } from 'rxjs'; // ضروري جداً لمراقبة المسار والبارامترات معاً
 
 import { MetaService } from '../../../core/services/meta.service';
 import { GroupTabPage, TabPage } from '../../../core/models/metadata.model';
@@ -19,7 +19,6 @@ import { SmartTable } from '../../../shared/components/smart-table/smart-table';
   standalone: true,
   imports: [
     CommonModule,
-    MatTabsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -33,122 +32,104 @@ import { SmartTable } from '../../../shared/components/smart-table/smart-table';
 })
 export class DynamicReport implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router); // هذا يحتاج للاستيراد في الأعلى
+  private router = inject(Router);
   private metaService = inject(MetaService);
+
   // State Signals
   groupConfig = signal<GroupTabPage | null>(null);
   activeTab = signal<TabPage | null>(null);
   tableData = signal<any[]>([]);
+  
   isLoading = signal<boolean>(false);
   isTableLoading = signal<boolean>(false);
   error = signal<string>('');
-  selectedTabIndex = signal<number>(0);
   lastUpdateTime = signal<Date | null>(null);
 
   // Computed
-  pageTitle = computed(() => this.groupConfig()?.pageTitle || 'تحميل...');
+  pageTitle = computed(() => {
+    const group = this.groupConfig();
+    const tab = this.activeTab();
+    return group && tab ? `${group.pageTitle} – ${tab.title}` : 'Loading...';
+  });
+  
   hasFilters = computed(() => (this.activeTab()?.filters?.length || 0) > 0);
   hasData = computed(() => this.tableData().length > 0);
 
   ngOnInit() {
-    // نراقب تغييرات الرابط والبارامترات معاً
-    this.route.paramMap.subscribe(params => {
-      const slug = params.get('slug');
-      if (slug) {
-        this.loadGroupConfig(slug);
-      }
-    });
+    // نراقب تغيير المسار (slug) وتغيير البارامتر (tabId) في نفس الوقت
+    combineLatest([
+      this.route.paramMap,
+      this.route.queryParamMap
+    ]).subscribe(([params, queryParams]) => {
+      const slug = params.get('slug'); // اسم المجموعة (sales, inventory...)
+      const tabId = queryParams.get('tabId'); // رقم التبويب (101, 102...)
 
-    // نراقب تغييرات الـ Query Params (لتبديل التبويب عند الضغط في القائمة)
-    this.route.queryParamMap.subscribe(queryParams => {
-      const tabId = queryParams.get('tabId');
-      // نقوم بالتبديل فقط إذا تم تحميل الكونفيج مسبقاً
-      if (this.groupConfig() && tabId) {
-        this.switchToTabById(Number(tabId));
+      if (slug) {
+        this.loadReportData(slug, tabId ? Number(tabId) : null);
       }
     });
   }
 
   /**
-   * تحميل تكوين الصفحة من الـ API
+   * تحميل بيانات الصفحة بناءً على الرابط
    */
-  loadGroupConfig(slug: string): void {
+  loadReportData(slug: string, tabId: number | null): void {
     this.isLoading.set(true);
     this.error.set('');
-    
+
     this.metaService.getGroupConfig(slug).subscribe({
       next: (config) => {
-        this.groupConfig.set(config);
-        
-        // بعد تحميل الكونفيج، نتحقق هل هناك تبويب محدد في الرابط؟
-        const tabIdFromUrl = this.route.snapshot.queryParamMap.get('tabId');
-        
-        if (tabIdFromUrl) {
-          this.switchToTabById(Number(tabIdFromUrl));
-        } else if (config!.tabs && config!.tabs.length > 0) {
-          // إذا لم يوجد، نفتح الأول افتراضياً
-          this.setActiveTab(config!.tabs[0], 0);
+        if (!config) {
+          this.error.set('الصفحة غير موجودة');
+          this.isLoading.set(false);
+          return;
         }
-        
+
+        this.groupConfig.set(config);
+
+        // البحث عن التبويب المطلوب
+        let targetTab: TabPage | undefined;
+
+        if (tabId) {
+          targetTab = config.tabs.find(t => t.id === tabId);
+        }
+
+        // إذا لم يتم تحديد تبويب، أو التبويب غير موجود، نفتح الأول افتراضياً
+        if (!targetTab && config.tabs.length > 0) {
+          targetTab = config.tabs[0];
+          // نقوم بتحديث الرابط ليحتوي على ID التبويب الافتراضي (لتحسين الـ UX)
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { tabId: targetTab.id },
+            replaceUrl: true
+          });
+        }
+
+        if (targetTab) {
+          this.activeTab.set(targetTab);
+          this.tableData.set([]); // تصفير البيانات القديمة
+          
+          // تحميل البيانات تلقائياً إذا لم يكن هناك فلاتر إجبارية
+          // أو يمكنك استدعاء fetchData مباشرة هنا
+          if (!targetTab.filters || targetTab.filters.length === 0) {
+             this.fetchData(targetTab.procedureName, {});
+          }
+        } else {
+          this.error.set('لا توجد تبويبات متاحة في هذه المجموعة');
+        }
+
         this.isLoading.set(false);
       },
       error: (err) => {
-        this.error.set('فشل في تحميل التقرير.');
+        console.error(err);
+        this.error.set('فشل في تحميل إعدادات التقرير');
         this.isLoading.set(false);
       }
     });
   }
 
-  // دالة مساعدة للبحث عن التبويب وتفعيله
-  private switchToTabById(tabId: number): void {
-    const config = this.groupConfig();
-    if (!config) return;
+  // ========== Data Actions ==========
 
-    const tabIndex = config.tabs.findIndex(t => t.id === tabId);
-    if (tabIndex !== -1) {
-      // إذا وجدنا التبويب، نفعله
-      // ملاحظة: نستخدم setTimeout لتجنب خطأ ExpressionChangedAfterItHasBeenChecked أحياناً
-      // ولكن هنا غالباً لا نحتاجها لأننا نستخدم Signals
-      this.setActiveTab(config.tabs[tabIndex], tabIndex);
-    }
-  }
-
-  /**
-   * تعيين التبويب النشط
-   */
-  setActiveTab(tab: TabPage, index: number): void {
-    // 1. تحديث الحالة الداخلية
-    this.selectedTabIndex.set(index);
-    this.activeTab.set(tab);
-    this.tableData.set([]);
-    
-    // 2. تحديث الرابط في المتصفح (دون إعادة تحميل الصفحة) ليعكس التبويب الحالي
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { tabId: tab.id },
-      queryParamsHandling: 'merge', // دمج مع البارامترات الموجودة
-      replaceUrl: true // استبدال الرابط في التاريخ
-    });
-
-    // 3. تحميل البيانات
-    if (!tab.filters || tab.filters.length === 0) {
-      this.fetchData(tab.procedureName, {});
-    }
-  }
-
-  /**
-   * عند تغيير التبويب (تم حذف النسخة المكررة)
-   */
-  onTabChange(index: number): void {
-    const config = this.groupConfig();
-    if (config && config.tabs[index]) {
-      this.setActiveTab(config.tabs[index], index);
-    }
-  }
-
-  /**
-   * عند البحث باستخدام الفلاتر
-   */
   onSearch(filterValues: any): void {
     const currentTab = this.activeTab();
     if (currentTab) {
@@ -156,9 +137,6 @@ export class DynamicReport implements OnInit {
     }
   }
 
-  /**
-   * جلب البيانات من الـ API
-   */
   fetchData(procedureName: string, filters: any): void {
     this.isTableLoading.set(true);
     
@@ -176,9 +154,6 @@ export class DynamicReport implements OnInit {
     });
   }
 
-  /**
-   * تحديث البيانات
-   */
   refreshData(): void {
     const currentTab = this.activeTab();
     if (currentTab) {
@@ -186,9 +161,6 @@ export class DynamicReport implements OnInit {
     }
   }
 
-  /**
-   * تصدير البيانات
-   */
   exportData(): void {
     const data = this.tableData();
     if (data.length > 0) {
@@ -197,27 +169,19 @@ export class DynamicReport implements OnInit {
     }
   }
 
-  /**
-   * إعادة المحاولة عند الخطأ
-   */
   retry(): void {
     const slug = this.route.snapshot.params['slug'];
+    const tabId = this.route.snapshot.queryParams['tabId'];
     if (slug) {
-      this.loadGroupConfig(slug);
+      this.loadReportData(slug, tabId ? Number(tabId) : null);
     }
   }
 
-  /**
-   * عند النقر على صف في الجدول
-   */
   onRowClick(event: any): void {
-    console.log('تم النقر على صف:', event);
+    console.log('Row Click:', event);
   }
 
-  /**
-   * عند النقر على زر إجراء (Action) داخل الجدول
-   */
   onActionClick(event: any): void {
-    console.log('تم النقر على إجراء:', event);
+    console.log('Action Click:', event);
   }
 }

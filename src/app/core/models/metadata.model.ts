@@ -30,8 +30,9 @@ export interface ReportColumn {
 export interface TabPage {
   id: number;
   title: string;
+  slug: string;        
+  // isActive: boolean;
   procedureName: string;
-  isActive: boolean;
   filters: ReportFilter[];
   columns: ReportColumn[];
 }
@@ -39,6 +40,7 @@ export interface TabPage {
 export interface GroupTabPage {
   groupId: number;
   pageTitle: string;
+  description?: string; 
   slug: string;  
   icon?: string;
   tabs: TabPage[];
@@ -47,7 +49,6 @@ export interface MenuItem {
   label: string;
   icon: string;
   route?: string; 
-  queryParams?: any;  
   roles?: string[];
   children?: MenuItem[];
 }

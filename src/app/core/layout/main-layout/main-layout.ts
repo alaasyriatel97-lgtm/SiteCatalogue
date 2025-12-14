@@ -31,11 +31,9 @@ export class MainLayout implements OnInit {
   isMobile = signal(false);
   currentUser = computed(() => this.authService.getCurrentUser());
 
-  // القائمة كـ Signal
-  menuItems = signal<MenuItem[]>([]);
+   menuItems = signal<MenuItem[]>([]);
   
-  // متغير لتتبع أي قائمة مفتوحة حالياً
-  expandedItem = signal<string | null>(null);
+   expandedItem = signal<string | null>(null);
 
   constructor() {
     this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
@@ -49,8 +47,7 @@ export class MainLayout implements OnInit {
   }
 
   loadMenu() {
-    // عنصر القائمة الرئيسية الثابت
-    const staticItems: MenuItem[] = [
+     const staticItems: MenuItem[] = [
       { 
         label: 'الرئيسية', 
         icon: 'dashboard', 
@@ -58,13 +55,11 @@ export class MainLayout implements OnInit {
       }
     ];
 
-    // جلب عناصر القائمة الديناميكية
-    this.metaService.getMenuItems().subscribe({
+     this.metaService.getMenuItems().subscribe({
       next: (groups) => {
         console.log('📋 Menu Groups loaded:', groups);
         
-        // تحويل GroupTabPage[] إلى MenuItem[]
-        const dynamicItems: MenuItem[] = groups.map(group => ({
+         const dynamicItems: MenuItem[] = groups.map(group => ({
           label: group.pageTitle,
           icon: group.icon || 'folder',
           route: undefined, // لا يوجد رابط مباشر للمجموعة
@@ -77,14 +72,12 @@ export class MainLayout implements OnInit {
           }))
         }));
 
-        // دمج القائمة الثابتة مع الديناميكية
-        this.menuItems.set([...staticItems, ...dynamicItems]);
+         this.menuItems.set([...staticItems, ...dynamicItems]);
         console.log('✅ Final menu items:', this.menuItems());
       },
       error: (err) => {
         console.error('❌ Error loading menu:', err);
-        // في حالة الخطأ، نعرض القائمة الثابتة فقط
-        this.menuItems.set(staticItems);
+         this.menuItems.set(staticItems);
       }
     });
   }

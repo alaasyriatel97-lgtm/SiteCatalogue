@@ -6,12 +6,12 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
   
-  // استثناء طلبات تسجيل الدخول
+ 
   if (req.url.includes('/auth/login') || req.url.includes('/auth/refresh')) {
     return next(req);
   }
   
-  // إضافة التوكن للطلبات الأخرى
+ 
   if (token && !authService.isTokenExpired()) {
     req = req.clone({
       setHeaders: {

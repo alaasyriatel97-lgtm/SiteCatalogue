@@ -31,9 +31,9 @@ export class MockDataService {
         // ---------- Main Info ----------
         {
           id: 101,
+          slug: 'main-info',
           title: 'Main Info',
           procedureName: 'GetSiteMainInfo',
-          isActive: true,
           filters: [
             {
               id: 1,
@@ -91,9 +91,9 @@ export class MockDataService {
         // ---------- Bands ----------
         {
           id: 102,
+          slug: 'bands',
           title: 'Bands',
           procedureName: 'GetSiteBands',
-          isActive: true,
           filters: [
             {
               id: 5,
@@ -118,9 +118,9 @@ export class MockDataService {
         // ---------- Power ----------
         {
           id: 103,
+          slug: 'power',
           title: 'Power',
           procedureName: 'GetSitePower',
-          isActive: true,
           filters: [
             {
               id: 6,
@@ -156,9 +156,9 @@ export class MockDataService {
       tabs: [
         {
           id: 201,
+          slug: 'records',
           title: 'Outage Records',
           procedureName: 'GetOutageData',
-          isActive: true,
           filters: [
             { id: 7, procedureId: 201, key: 'fromDate', label: 'From Date', type: 'date', isRequired: false, order: 1 },
             { id: 8, procedureId: 201, key: 'toDate', label: 'To Date', type: 'date', isRequired: false, order: 2 },
@@ -193,12 +193,15 @@ export class MockDataService {
       slug: 'top-outage',
       pageTitle: 'Top Outage',
       icon: 'priority_high',
+
+
+
       tabs: [
         {
           id: 301,
           title: 'Top Outages',
           procedureName: 'GetTopOutages',
-          isActive: true,
+          slug: 'Orecords',
           filters: [
             {
               id: 10,
