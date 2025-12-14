@@ -62,8 +62,7 @@ export class Dashboard{
       color: 'purple'
     }
   ]);
-
-  quickActions = signal([
+   quickActions = signal([
     { title: 'تقارير المبيعات', icon: 'analytics', route: '/reports/sales' },
     { title: 'إدارة المخزون', icon: 'inventory', route: '/reports/inventory' },
     { title: 'دليل المواقع', icon: 'location_on', route: '/reports/sites' }

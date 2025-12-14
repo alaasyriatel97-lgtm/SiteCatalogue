@@ -14,123 +14,10 @@ export class MockDataService {
 
     // تقرير المبيعات
     'sales': {
-      groupId: 1,slug: 'sales',
-      pageTitle: 'تقارير fdgdfg والإيرادات',
-      icon: 'shopping_cart',
-      tabs: [
-        {
-          id: 101,
-          title: 'المبيعات الشهرية',
-          procedureName: 'GetMonthlySales',
-          isActive: true,
-          filters: [
-            {
-              id: 1,
-              procedureId: 101,
-              key: 'year',
-              label: 'السنة',
-              type: 'select',
-              isRequired: true,
-              order: 1,
-              dataSourceType: 'static',
-              dataSourceValue: '2022,2023,2024,2025',
-              defaultValue: '2024'
-            },
-            {
-              id: 2,
-              procedureId: 101,
-              key: 'month',
-              label: 'الشهر',
-              type: 'select',
-              isRequired: false,
-              order: 2,
-              dataSourceType: 'static',
-              dataSourceValue: 'يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر'
-            },
-            {
-              id: 3,
-              procedureId: 101,
-              key: 'region',
-              label: 'المنطقة',
-              type: 'select',
-              isRequired: false,
-              order: 3,
-              dataSourceType: 'static',
-              dataSourceValue: 'دمشق,حلب,حمص,اللاذقية,طرطوس,حماة'
-            },
-            {
-              id: 4,
-              procedureId: 101,
-              key: 'searchTerm',
-              label: 'بحث',
-              type: 'text',
-              isRequired: false,
-              order: 4,
-              placeholder: 'ابحث في المنتجات...'
-            }
-          ],
-          columns: [
-            { id: 1, field: 'id', header: '#', type: 'text', isSortable: false, isActive: true, width: '60px' },
-            { id: 2, field: 'productName', header: 'اسم المنتج', type: 'text', isSortable: true, isActive: true },
-            { id: 3, field: 'category', header: 'الفئة', type: 'text', isSortable: true, isActive: true },
-            { id: 4, field: 'quantity', header: 'الكمية', type: 'text', isSortable: true, isActive: true },
-            { id: 5, field: 'unitPrice', header: 'السعر', type: 'currency', isSortable: true, isActive: true },
-            { id: 6, field: 'totalAmount', header: 'الإجمالي', type: 'currency', isSortable: true, isActive: true },
-            { id: 7, field: 'saleDate', header: 'تاريخ البيع', type: 'date', isSortable: true, isActive: true },
-            { id: 8, field: 'status', header: 'الحالة', type: 'status', isSortable: true, isActive: true },
-            { id: 9, field: 'actions', header: 'الإجراءات', type: 'actions', isSortable: false, isActive: true }
-          ]
-        },
-        {
-          id: 102,
-          title: 'المبيعات حسب المنتج',
-          procedureName: 'GetSalesByProduct',
-          isActive: true,
-          filters: [
-            {
-              id: 5,
-              procedureId: 102,
-              key: 'category',
-              label: 'الفئة',
-              type: 'select',
-              isRequired: false,
-              order: 1,
-              dataSourceType: 'static',
-              dataSourceValue: 'إلكترونيات,ملابس,أطعمة,كتب,منزلية'
-            },
-            {
-              id: 6,
-              procedureId: 102,
-              key: 'dateFrom',
-              label: 'من تاريخ',
-              type: 'date',
-              isRequired: false,
-              order: 2
-            },
-            {
-              id: 7,
-              procedureId: 102,
-              key: 'dateTo',
-              label: 'إلى تاريخ',
-              type: 'date',
-              isRequired: false,
-              order: 3
-            }
-          ],
-          columns: [
-            { id: 1, field: 'productName', header: 'المنتج', type: 'text', isSortable: true, isActive: true },
-            { id: 2, field: 'category', header: 'الفئة', type: 'text', isSortable: true, isActive: true },
-            { id: 3, field: 'totalSales', header: 'إجمالي المبيعات', type: 'currency', isSortable: true, isActive: true },
-            { id: 4, field: 'soldQuantity', header: 'الكمية المباعة', type: 'text', isSortable: true, isActive: true },
-            { id: 5, field: 'avgPrice', header: 'متوسط السعر', type: 'currency', isSortable: true, isActive: true }
-          ]
-        }
-      ]
-    },
-    'sss': {
-      groupId: 1,slug: 'sss',
+      groupId: 1,
+      slug: 'sales',
       pageTitle: 'تقارير المبيعات والإيرادات',
-      icon: 'inventory_2',
+      icon: 'shopping_cart',
       tabs: [
         {
           id: 101,
@@ -244,8 +131,10 @@ export class MockDataService {
 
     // تقرير المخزون
     'inventory': {
-      groupId: 2, icon: 'location_on',slug: 'inventory',
+      groupId: 2,
+      slug: 'inventory',
       pageTitle: 'إدارة المخزون',
+      icon: 'inventory_2',
       tabs: [
         {
           id: 201,
@@ -312,8 +201,10 @@ export class MockDataService {
 
     // دليل المواقع
     'sites': {
-      groupId: 3,slug: 'sites',
-      pageTitle: 'دليل المواقع (Site Catalog)', icon: 'location_on',
+      groupId: 3,
+      slug: 'sites',
+      pageTitle: 'دليل المواقع (Site Catalog)',
+      icon: 'location_on',
       tabs: [
         {
           id: 301,
@@ -399,7 +290,7 @@ export class MockDataService {
    */
   getGroupConfig(slug: string): Observable<GroupTabPage | null> {
     const config = this.mockPages[slug] || null;
-    return of(config).pipe(delay(500)); // محاكاة تأخير الشبكة
+    return of(config).pipe(delay(500));
   }
 
   /**
@@ -536,16 +427,13 @@ export class MockDataService {
     }));
   }
 
-  getMenuItems(): Observable<any[]> {
-    const items = Object.keys(this.mockPages).map(slug => {
-      const page = this.mockPages[slug];
-      return {
-        label: page.pageTitle,
-        icon: page.icon || 'folder', 
-        route: `/reports/${slug}`,
-        roles: []  
-      };
-    });
-    return of(Object.values(this.mockPages));
+  /**
+   * جلب عناصر القائمة - هذه الدالة كانت المشكلة!
+   * يجب أن ترجع GroupTabPage[] وليس MenuItem[]
+   */
+  getMenuItems(): Observable<GroupTabPage[]> {
+    // نرجع كل الصفحات كـ array
+    const pages = Object.values(this.mockPages);
+    return of(pages).pipe(delay(300));
   }
 }

@@ -16,7 +16,6 @@ import { MenuItem } from '../../models/metadata.model';
     RouterModule,
     MatIconModule,
     MatMenuModule
-    // تمت إزالة MatDividerModule واستخدام HTML عادي بدلاً منه
   ],
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.scss']
@@ -50,31 +49,43 @@ export class MainLayout implements OnInit {
   }
 
   loadMenu() {
+    // عنصر القائمة الرئيسية الثابت
     const staticItems: MenuItem[] = [
-      { label: 'الرئيسية', icon: 'dashboard', route: '/dashboard' }
+      { 
+        label: 'الرئيسية', 
+        icon: 'dashboard', 
+        route: '/dashboard'
+      }
     ];
 
+    // جلب عناصر القائمة الديناميكية
     this.metaService.getMenuItems().subscribe({
-      next: (groups: any[]) => {
+      next: (groups) => {
+        console.log('📋 Menu Groups loaded:', groups);
         
+        // تحويل GroupTabPage[] إلى MenuItem[]
         const dynamicItems: MenuItem[] = groups.map(group => ({
           label: group.pageTitle,
           icon: group.icon || 'folder',
-          route: undefined, 
-          children: group.tabs.map((tab: any) => ({
+          route: undefined, // لا يوجد رابط مباشر للمجموعة
+          children: group.tabs.map((tab: { title: any; id: any; }) => ({
             label: tab.title,
             icon: 'circle',
-            // التصحيح: الرابط هو المسار فقط (بدون ؟ وبدون بارامترات)
-            route: `/reports/${group.slug}`, 
-            // التصحيح: البارامترات توضع هنا ككائن منفصل
-            queryParams: { tabId: tab.id }, 
+            route: `/reports/${group.slug}`,
+            queryParams: { tabId: tab.id },
             roles: []
           }))
         }));
 
+        // دمج القائمة الثابتة مع الديناميكية
         this.menuItems.set([...staticItems, ...dynamicItems]);
+        console.log('✅ Final menu items:', this.menuItems());
       },
-      error: (err) => console.error('Error loading menu:', err)
+      error: (err) => {
+        console.error('❌ Error loading menu:', err);
+        // في حالة الخطأ، نعرض القائمة الثابتة فقط
+        this.menuItems.set(staticItems);
+      }
     });
   }
 

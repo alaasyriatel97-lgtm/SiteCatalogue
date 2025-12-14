@@ -1,78 +1,101 @@
-<div class="bg-gray-100 text-body min-h-screen font-satoshi">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
   
   <div class="flex h-screen overflow-hidden">
     
+    <!-- ========== SIDEBAR ========== -->
     <aside
-      class="absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-white border-r border-stroke duration-300 ease-linear lg:static lg:translate-x-0"
+      class="fixed left-0 top-0 z-50 flex h-screen w-72 flex-col overflow-y-auto border-r border-slate-200 bg-white/80 backdrop-blur-xl shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0"
       [class.translate-x-0]="isSidebarOpen()"
       [class.-translate-x-full]="!isSidebarOpen() && isMobile()"
-      [class.hidden]="!isSidebarOpen() && !isMobile()"
     >
-      <div class="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <a href="/" class="flex items-center gap-2">
-           <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white font-bold">SYR</div>
-           <span class="text-xl font-bold text-black">Syriatel</span>
+      <!-- Logo Header -->
+      <div class="flex items-center justify-between gap-3 border-b border-slate-200 bg-gradient-to-r from-primary to-indigo-600 px-6 py-5">
+        <a href="/" class="flex items-center gap-3 group">
+           <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+             <span class="text-xl font-bold bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">SYR</span>
+           </div>
+           <div class="flex flex-col">
+             <span class="text-lg font-bold text-white">Syriatel</span>
+             <span class="text-xs text-blue-100">Power Dashboard</span>
+           </div>
         </a>
         
-        <button class="block lg:hidden" (click)="toggleSidebar()">
-          <mat-icon class="text-black">arrow_back</mat-icon>
+        <button class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-white backdrop-blur-sm transition hover:bg-white/20 lg:hidden" (click)="toggleSidebar()">
+          <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <div class="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
-        <nav class="mt-5 py-4 px-4 lg:mt-9 lg:px-6">
-          <div>
-            <h3 class="mb-4 ml-4 text-sm font-medium text-bodydark2">القائمة الرئيسية</h3>
+      <!-- Navigation Menu -->
+      <div class="flex-1 overflow-y-auto px-4 py-6">
+        <nav>
+          <div class="mb-6">
+            <h3 class="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">القائمة الرئيسية</h3>
             
-            <ul class="mb-6 flex flex-col gap-1.5">
+            <ul class="space-y-1">
   
               @for (item of menuItems(); track item.label) {
                 
+                <!-- بدون قائمة فرعية -->
                 @if (!item.children || item.children.length === 0) {
                   <li>
                     <a
                       [routerLink]="item.route"
-                      routerLinkActive="bg-primary text-white"
-                      class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-gray-100 text-black dark:text-white dark:hover:bg-meta-4"
+                      routerLinkActive="active-link"
+                      class="nav-link group relative flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-primary/10 hover:to-indigo-50 hover:text-primary"
                     >
-                      <mat-icon class="text-xl">{{ item.icon }}</mat-icon>
-                      <span>{{ item.label }}</span>
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-all group-hover:bg-primary group-hover:text-white group-hover:shadow-lg">
+                        <mat-icon class="text-xl">{{ item.icon }}</mat-icon>
+                      </div>
+                      <span class="flex-1">{{ item.label }}</span>
+                      <div class="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-primary opacity-0 transition-opacity group-hover:opacity-100"></div>
                     </a>
                   </li>
                 }
             
+                <!-- مع قائمة فرعية -->
                 @else {
                   <li>
                     <a
                       href="javascript:void(0)"
-                      class="group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium duration-300 ease-in-out hover:bg-gray-100 text-black dark:text-white dark:hover:bg-meta-4"
-                      [class.bg-gray-100]="isExpanded(item.label)"
+                      class="nav-link group relative flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-primary/10 hover:to-indigo-50 hover:text-primary"
+                      [class.bg-primary/5]="isExpanded(item.label)"
+                      [class.text-primary]="isExpanded(item.label)"
                       (click)="toggleSubmenu(item.label)"
                     >
-                      <mat-icon class="text-xl">{{ item.icon }}</mat-icon>
-                      <span>{{ item.label }}</span>
+                      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-all group-hover:bg-primary group-hover:text-white group-hover:shadow-lg"
+                           [class.bg-primary]="isExpanded(item.label)"
+                           [class.text-white]="isExpanded(item.label)">
+                        <mat-icon class="text-xl">{{ item.icon }}</mat-icon>
+                      </div>
+                      <span class="flex-1">{{ item.label }}</span>
                       
                       <mat-icon 
-                        class="absolute left-4 top-1/2 -translate-y-1/2 fill-current text-xl transition-transform duration-300"
+                        class="text-xl transition-transform duration-300"
                         [class.rotate-180]="isExpanded(item.label)"
                       >
-                        keyboard_arrow_down
+                        expand_more
                       </mat-icon>
                     </a>
             
-                    <div class="overflow-hidden transition-all duration-300" 
-                         [class.hidden]="!isExpanded(item.label)">
-                      <ul class="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6 pr-4">
+                    <!-- Submenu -->
+                    <div 
+                      class="overflow-hidden transition-all duration-300" 
+                      [class.max-h-0]="!isExpanded(item.label)"
+                      [class.max-h-96]="isExpanded(item.label)"
+                      [class.opacity-0]="!isExpanded(item.label)"
+                      [class.opacity-100]="isExpanded(item.label)"
+                    >
+                      <ul class="mt-2 space-y-1 pl-4 pr-2">
                         @for (child of item.children; track child.label) {
                           <li>
                             <a
                               [routerLink]="child.route"
                               [queryParams]="child.queryParams" 
-                              routerLinkActive="text-primary"
-                              class="group relative flex items-center gap-2.5 rounded-md px-4 font-medium duration-300 ease-in-out hover:text-primary text-body"
+                              routerLinkActive="active-sublink"
+                              class="group flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-primary/5 hover:text-primary"
                             >
-                              <span class="h-2 w-2 rounded-full border border-current opacity-70"></span>
-                              {{ child.label }}
+                              <div class="flex h-2 w-2 rounded-full border-2 border-slate-400 transition-all group-hover:border-primary group-hover:bg-primary"></div>
+                              <span>{{ child.label }}</span>
                             </a>
                           </li>
                         }
@@ -85,85 +108,139 @@
           </div>
         </nav>
       </div>
+
+      <!-- Sidebar Footer -->
+      <div class="border-t border-slate-200 bg-gradient-to-r from-slate-50 to-blue-50 p-4">
+        <div class="flex items-center gap-3 rounded-xl bg-white p-3 shadow-sm">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-indigo-600 text-white font-bold text-sm shadow-md">
+            {{ currentUser()?.userName?.charAt(0) || 'U' }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-slate-900 truncate">{{ currentUser()?.userName }}</p>
+            <p class="text-xs text-slate-500">مسؤول النظام</p>
+          </div>
+        </div>
+      </div>
     </aside>
 
+    <!-- ========== MAIN CONTENT AREA ========== -->
     <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
       
-      <header class="sticky top-0 z-999 flex w-full bg-white drop-shadow-1">
-        <div class="flex flex-grow items-center justify-between px-4 py-4 shadow-2 md:px-6 2xl:px-11">
+      <!-- ========== HEADER ========== -->
+      <header class="sticky top-0 z-40 flex w-full border-b border-slate-200 bg-white/80 backdrop-blur-xl shadow-sm">
+        <div class="flex flex-grow items-center justify-between px-4 py-4 md:px-6 2xl:px-11">
           
-          <div class="flex items-center gap-2 sm:gap-4 lg:hidden">
+          <!-- Mobile Menu Toggle + Search -->
+          <div class="flex items-center gap-4">
             <button
-              class="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm"
+              class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition hover:bg-slate-50 lg:hidden"
               (click)="toggleSidebar()"
             >
               <mat-icon>menu</mat-icon>
             </button>
-          </div>
 
-          <div class="hidden sm:block">
-            <div class="relative">
-              <button class="absolute left-0 top-1/2 -translate-y-1/2">
-                  <mat-icon class="text-bodydark2">search</mat-icon>
-              </button>
-              <input
-                type="text"
-                placeholder="بحث..."
-                class="w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none xl:w-125 text-black"
-              />
+            <!-- Search Bar -->
+            <div class="hidden sm:block">
+              <div class="relative">
+                <button class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                    <mat-icon class="text-xl">search</mat-icon>
+                </button>
+                <input
+                  type="text"
+                  placeholder="ابحث في النظام..."
+                  class="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 xl:w-96"
+                />
+              </div>
             </div>
           </div>
 
-          <div class="flex items-center gap-3 2xsm:gap-7">
-            <ul class="flex items-center gap-2 2xsm:gap-4">
-               <li class="relative">
-                 <button class="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary">
-                    <mat-icon class="text-current text-xl">notifications_none</mat-icon>
-                    <span class="absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-red-500"></span>
-                 </button>
-               </li>
-            </ul>
+          <!-- Right Actions -->
+          <div class="flex items-center gap-3">
+            <!-- Notifications -->
+            <button class="relative flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition hover:bg-slate-50">
+              <mat-icon class="text-xl text-slate-600">notifications_none</mat-icon>
+              <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-lg">3</span>
+            </button>
 
+            <!-- Settings -->
+            <button class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm transition hover:bg-slate-50">
+              <mat-icon class="text-xl text-slate-600">settings</mat-icon>
+            </button>
+
+            <!-- User Menu -->
             <div class="relative">
-              <button [matMenuTriggerFor]="userMenu" class="flex items-center gap-4">
+              <button [matMenuTriggerFor]="userMenu" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:bg-slate-50">
                 <span class="hidden text-right lg:block">
-                  <span class="block text-sm font-medium text-black">{{ currentUser()?.userName }}</span>
-                  <span class="block text-xs font-medium">UX Designer</span>
+                  <span class="block text-sm font-semibold text-slate-900">{{ currentUser()?.userName }}</span>
+                  <span class="block text-xs text-slate-500">UX Designer</span>
                 </span>
-                <span class="h-12 w-12 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center text-lg">
+                <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-indigo-600 text-white font-bold text-sm shadow-md">
                   {{ currentUser()?.userName?.charAt(0) || 'U' }}
-                </span>
-                <mat-icon class="hidden sm:block text-black">keyboard_arrow_down</mat-icon>
+                </div>
+                <mat-icon class="hidden sm:block text-slate-400 text-xl">expand_more</mat-icon>
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <main>
+      <!-- ========== PAGE CONTENT ========== -->
+      <main class="flex-1">
         <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
           <router-outlet></router-outlet>
         </div>
       </main>
       
+      <!-- ========== FOOTER ========== -->
+      <footer class="border-t border-slate-200 bg-white/50 backdrop-blur-sm">
+        <div class="mx-auto max-w-screen-2xl px-4 py-4 md:px-6 2xl:px-10">
+          <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p class="text-sm text-slate-600">
+              © 2024 Syriatel Mobile Telecom. All rights reserved.
+            </p>
+            <div class="flex items-center gap-4">
+              <a href="#" class="text-sm text-slate-600 hover:text-primary transition">سياسة الخصوصية</a>
+              <span class="text-slate-300">•</span>
+              <a href="#" class="text-sm text-slate-600 hover:text-primary transition">شروط الاستخدام</a>
+              <span class="text-slate-300">•</span>
+              <a href="#" class="text-sm text-slate-600 hover:text-primary transition">الدعم الفني</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
 </div>
 
-<mat-menu #userMenu="matMenu" xPosition="before">
-  <button mat-menu-item>
-    <mat-icon>person</mat-icon>
-    <span>الملف الشخصي</span>
-  </button>
-  <button mat-menu-item>
-    <mat-icon>settings</mat-icon>
-    <span>الإعدادات</span>
+<!-- User Menu -->
+<mat-menu #userMenu="matMenu" xPosition="before" class="mt-2">
+  <button mat-menu-item class="flex items-center gap-3 px-4 py-3">
+    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+      <mat-icon>person</mat-icon>
+    </div>
+    <span class="font-medium">الملف الشخصي</span>
   </button>
   
-  <hr class="my-1 border-slate-200" />
+  <button mat-menu-item class="flex items-center gap-3 px-4 py-3">
+    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+      <mat-icon>settings</mat-icon>
+    </div>
+    <span class="font-medium">الإعدادات</span>
+  </button>
+
+  <button mat-menu-item class="flex items-center gap-3 px-4 py-3">
+    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+      <mat-icon>help_outline</mat-icon>
+    </div>
+    <span class="font-medium">المساعدة</span>
+  </button>
   
-  <button mat-menu-item (click)="logout()">
-    <mat-icon>exit_to_app</mat-icon>
-    <span>تسجيل الخروج</span>
+  <hr class="my-2 border-slate-200" />
+  
+  <button mat-menu-item (click)="logout()" class="flex items-center gap-3 px-4 py-3 text-red-600">
+    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50">
+      <mat-icon>exit_to_app</mat-icon>
+    </div>
+    <span class="font-medium">تسجيل الخروج</span>
   </button>
 </mat-menu>
