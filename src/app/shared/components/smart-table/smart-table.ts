@@ -77,9 +77,7 @@ export class SmartTable {
     return this.sortedData().slice(start, end);
   });
 
-  /**
-   * معالجة الفرز
-   */
+ 
   onSort(column: ReportColumn): void {
     if (!column.isSortable) return;
 
@@ -100,35 +98,25 @@ export class SmartTable {
       this.sortDirection.set('asc');
     }
   }
-
-  /**
-   * الحصول على أيقونة الفرز
-   */
+ 
   getSortIcon(field: string): string {
     if (this.sortField() !== field) return 'unfold_more';
     if (this.sortDirection() === 'asc') return 'arrow_upward';
     if (this.sortDirection() === 'desc') return 'arrow_downward';
     return 'unfold_more';
   }
-
-  /**
-   * معالجة تغيير الصفحة
-   */
+ 
   onPageChange(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
   }
 
-  /**
-   * معالجة النقر على الصف
-   */
+ 
   onRowClick(row: any): void {
     this.rowClick.emit(row);
   }
 
-  /**
-   * الحصول على class الحالة
-   */
+
   getStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
       'Active': 'status-success',
@@ -145,18 +133,13 @@ export class SmartTable {
     return statusMap[status] || 'status-default';
   }
 
-  /**
-   * تنسيق التاريخ
-   */
+ 
   formatDate(date: string | Date): string {
     if (!date) return '-';
     const d = new Date(date);
     return d.toLocaleDateString('ar-SA');
   }
-
-  /**
-   * تنسيق العملة
-   */
+ 
   formatCurrency(value: number | string): string {
     if (value == null) return '-';
     const num = typeof value === 'string' ? parseFloat(value) : value;

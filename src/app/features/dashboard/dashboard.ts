@@ -1,8 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 interface StatCard {
@@ -20,51 +18,51 @@ interface StatCard {
   imports: [
     CommonModule,
     RouterModule,
-    MatCardModule,
-    MatButtonModule,
     MatIconModule
+    // تمت إزالة MatCardModule و MatButtonModule للاعتماد على Tailwind
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss']
 })
-export class Dashboard{
+export class Dashboard {
   stats = signal<StatCard[]>([
     {
-      title: 'إجمالي المبيعات',
-      value: '$45,231',
-      change: '+12.5%',
+      title: 'Total Sites',
+      value: '248',
+      change: '+4.2%',
       trend: 'up',
-      icon: 'attach_money',
-      color: 'green'
-    },
-    {
-      title: 'عدد الطلبات',
-      value: '1,258',
-      change: '+8.2%',
-      trend: 'up',
-      icon: 'shopping_cart',
+      icon: 'cell_tower',
       color: 'blue'
     },
     {
-      title: 'المخزون',
-      value: '3,542',
-      change: '-3.1%',
+      title: 'Active Sites',
+      value: '221',
+      change: '+2.1%',
+      trend: 'up',
+      icon: 'check_circle',
+      color: 'green'
+    },
+    {
+      title: 'Sites with Power Issues',
+      value: '17',
+      change: '-5.6%',
       trend: 'down',
-      icon: 'inventory_2',
+      icon: 'bolt',
       color: 'orange'
     },
     {
-      title: 'المستخدمين',
-      value: '892',
-      change: '+15.3%',
-      trend: 'up',
-      icon: 'people',
-      color: 'purple'
+      title: 'Current Outages',
+      value: '10',
+      change: '-12.3%',
+      trend: 'down',
+      icon: 'warning',
+      color: 'red'
     }
   ]);
-   quickActions = signal([
-    { title: 'تقارير المبيعات', icon: 'analytics', route: '/reports/sales' },
-    { title: 'إدارة المخزون', icon: 'inventory', route: '/reports/inventory' },
-    { title: 'دليل المواقع', icon: 'location_on', route: '/reports/sites' }
+
+  quickActions = signal([
+    { title: 'Site Overview', icon: 'cell_tower', route: '/reports/sites' },
+    { title: 'Availability Reports', icon: 'check_circle', route: '/reports/availability' },
+    { title: 'Power Status', icon: 'bolt', route: '/reports/power' }
   ]);
 }

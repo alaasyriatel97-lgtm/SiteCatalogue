@@ -56,13 +56,12 @@ export class DynamicReport implements OnInit {
   hasData = computed(() => this.tableData().length > 0);
 
   ngOnInit() {
-    // نراقب تغيير المسار (slug) وتغيير البارامتر (tabId) في نفس الوقت
-    combineLatest([
+     combineLatest([
       this.route.paramMap,
       this.route.queryParamMap
     ]).subscribe(([params, queryParams]) => {
-      const slug = params.get('slug'); // اسم المجموعة (sales, inventory...)
-      const tabId = queryParams.get('tabId'); // رقم التبويب (101, 102...)
+      const slug = params.get('slug');  
+      const tabId = queryParams.get('tabId'); 
 
       if (slug) {
         this.loadReportData(slug, tabId ? Number(tabId) : null);
@@ -70,9 +69,7 @@ export class DynamicReport implements OnInit {
     });
   }
 
-  /**
-   * تحميل بيانات الصفحة بناءً على الرابط
-   */
+  
   loadReportData(slug: string, tabId: number | null): void {
     this.isLoading.set(true);
     this.error.set('');
@@ -80,25 +77,22 @@ export class DynamicReport implements OnInit {
     this.metaService.getGroupConfig(slug).subscribe({
       next: (config) => {
         if (!config) {
-          this.error.set('الصفحة غير موجودة');
+          this.error.set('Page not found');
           this.isLoading.set(false);
           return;
         }
 
         this.groupConfig.set(config);
 
-        // البحث عن التبويب المطلوب
-        let targetTab: TabPage | undefined;
+         let targetTab: TabPage | undefined;
 
         if (tabId) {
           targetTab = config.tabs.find(t => t.id === tabId);
         }
 
-        // إذا لم يتم تحديد تبويب، أو التبويب غير موجود، نفتح الأول افتراضياً
-        if (!targetTab && config.tabs.length > 0) {
+         if (!targetTab && config.tabs.length > 0) {
           targetTab = config.tabs[0];
-          // نقوم بتحديث الرابط ليحتوي على ID التبويب الافتراضي (لتحسين الـ UX)
-          this.router.navigate([], {
+           this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { tabId: targetTab.id },
             replaceUrl: true
@@ -107,22 +101,20 @@ export class DynamicReport implements OnInit {
 
         if (targetTab) {
           this.activeTab.set(targetTab);
-          this.tableData.set([]); // تصفير البيانات القديمة
+          this.tableData.set([]);  
           
-          // تحميل البيانات تلقائياً إذا لم يكن هناك فلاتر إجبارية
-          // أو يمكنك استدعاء fetchData مباشرة هنا
-          if (!targetTab.filters || targetTab.filters.length === 0) {
+            if (!targetTab.filters || targetTab.filters.length === 0) {
              this.fetchData(targetTab.procedureName, {});
           }
         } else {
-          this.error.set('لا توجد تبويبات متاحة في هذه المجموعة');
+          this.error.set('There are no available tabs in this group');
         }
 
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.error.set('فشل في تحميل إعدادات التقرير');
+        this.error.set('Failed to load report settings');
         this.isLoading.set(false);
       }
     });
@@ -165,8 +157,7 @@ export class DynamicReport implements OnInit {
     const data = this.tableData();
     if (data.length > 0) {
       console.log('Exporting data...', data);
-      alert('سيتم تصدير البيانات قريباً!');
-    }
+     }
   }
 
   retry(): void {

@@ -40,15 +40,11 @@ export class SmartFilter implements OnChanges {
   ngOnChanges(): void {
     this.buildForm();
   }
-
-  /**
-   * بناء النموذج ديناميكياً
-   */
+ 
   private buildForm(): void {
     const group: any = {};
     
-    // ترتيب الفلاتر
-    const sortedFilters = [...this.filters].sort((a, b) => a.order - b.order);
+     const sortedFilters = [...this.filters].sort((a, b) => a.order - b.order);
     
     sortedFilters.forEach(filter => {
       const validators = filter.isRequired ? [Validators.required] : [];
@@ -58,9 +54,7 @@ export class SmartFilter implements OnChanges {
     this.filterForm = this.fb.group(group);
   }
 
-  /**
-   * الحصول على خيارات القائمة المنسدلة
-   */
+ 
   getSelectOptions(filter: ReportFilter): string[] {
     if (filter.dataSourceType === 'static' && filter.dataSourceValue) {
       return filter.dataSourceValue.split(',').map(v => v.trim());
@@ -68,9 +62,7 @@ export class SmartFilter implements OnChanges {
     return [];
   }
 
-  /**
-   * إرسال النموذج
-   */
+ 
   onSubmit(): void {
     if (this.filterForm.valid) {
       this.filterSubmit.emit(this.filterForm.value);
@@ -79,29 +71,22 @@ export class SmartFilter implements OnChanges {
     }
   }
 
-  /**
-   * إعادة تعيين النموذج
-   */
+ 
   onReset(): void {
     this.filterForm.reset();
     this.filterReset.emit();
   }
-
-  /**
-   * التحقق من وجود أخطاء
-   */
+ 
   hasError(key: string): boolean {
     const control = this.filterForm.get(key);
     return !!(control && control.invalid && control.touched);
   }
 
-  /**
-   * الحصول على رسالة الخطأ
-   */
+  
   getErrorMessage(key: string): string {
     const control = this.filterForm.get(key);
     if (control?.hasError('required')) {
-      return 'هذا الحقل مطلوب';
+      return 'This field is required';
     }
     return '';
   }
