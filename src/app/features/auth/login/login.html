@@ -1,0 +1,89 @@
+<div class="flex h-screen w-full items-center justify-center bg-gray-100">
+  <div class="w-full max-w-125 rounded-sm border border-stroke bg-white shadow-default">
+    <div class="w-full p-4 sm:p-12.5 xl:p-17.5">
+
+      <!-- Header -->
+      <div class="mb-9 text-center">
+        <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded bg-primary/10 text-primary">
+            <span class="text-2xl font-bold">SYR</span>
+        </div>
+        <h2 class="mb-2 text-2xl font-bold text-black sm:text-title-xl2">
+          تسجيل الدخول
+        </h2>
+        <p class="font-medium text-body">Syriatel Mobile Telecom</p>
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage()) {
+        <div class="mb-5 flex w-full border-l-6 border-red-500 bg-red-50 px-7 py-4 shadow-md">
+            <div class="mr-5 flex h-9 w-full max-w-[36px] items-center justify-center rounded-lg bg-red-100">
+                <mat-icon class="text-red-500 text-xl">error</mat-icon>
+            </div>
+            <div class="w-full">
+                <h5 class="mb-1 text-lg font-bold text-red-500">خطأ</h5>
+                <p class="text-sm text-red-600">{{ errorMessage() }}</p>
+            </div>
+        </div>
+      }
+
+      <!-- Login Info -->
+      <div class="mb-6 text-center">
+        <p class="text-sm text-gray-600">
+          سيتم تسجيل الدخول باستخدام بيانات اعتماد Windows الخاصة بك
+        </p>
+      </div>
+
+      <!-- Login Button -->
+      <div class="mb-5">
+        <button
+          type="button"
+          [disabled]="isLoading()"
+          (click)="onLogin()"
+          class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90 disabled:opacity-50"
+        >
+          @if (isLoading()) {
+              <span class="flex items-center justify-center gap-2">
+                  <mat-spinner diameter="20" class="inline-block"></mat-spinner>
+                  جاري التحميل...
+              </span>
+          } @else {
+              تسجيل الدخول
+          }
+        </button>
+      </div>
+
+      <!-- Social Login Options (Optional) -->
+      <div class="saprator mt-3">
+        <span>أو تسجيل الدخول باستخدام</span>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-4">
+          <div class="d-grid">
+            <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
+              <img src="assets/images/authentication/google.svg" alt="google" />
+              <span class="d-none d-sm-inline-block">Google</span>
+            </button>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="d-grid">
+            <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
+              <img src="assets/images/authentication/twitter.svg" alt="twitter" />
+              <span class="d-none d-sm-inline-block">Twitter</span>
+            </button>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="d-grid">
+            <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
+              <img src="assets/images/authentication/facebook.svg" alt="facebook" />
+              <span class="d-none d-sm-inline-block">Facebook</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

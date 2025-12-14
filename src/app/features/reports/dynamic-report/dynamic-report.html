@@ -1,0 +1,131 @@
+<div class="w-full bg-white min-h-[calc(100vh-8rem)] rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-6 sm:p-10 animate-entry">
+  
+  @if (isLoading()) {
+    <div class="flex h-96 flex-col items-center justify-center animate-fade">
+      <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+         <mat-spinner diameter="32"></mat-spinner>
+      </div>
+      <p class="mt-4 text-lg font-medium text-slate-600">Please wait, loading...</p>
+    </div>
+  }
+
+  @else if (error()) {
+    <div class="flex h-96 flex-col items-center justify-center text-center animate-entry">
+        <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-[2rem] bg-red-50 text-red-500 shadow-sm ring-4 ring-red-50/50">
+            <mat-icon class="text-4xl h-10 w-10">error_outline</mat-icon>
+        </div>
+        <h3 class="mb-2 text-2xl font-bold text-slate-900">Oops! Something went wrong</h3>
+        <p class="mb-8 max-w-md text-slate-500">{{ error() }}</p>
+        <button class="flex items-center gap-2 rounded-xl bg-slate-900 py-3 px-8 font-medium text-white transition-transform hover:scale-105 hover:bg-slate-800 active:scale-95" (click)="retry()">
+          <mat-icon>refresh</mat-icon>
+          إعادة المحاولة
+        </button>
+    </div>
+  }
+
+  @else if (activeTab(); as tab) {
+    
+    <div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between animate-entry delay-100">
+      <div>
+        <div class="mb-2 flex items-center gap-2">
+           <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+            Site Information
+           </span>
+        </div>
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+          {{ pageTitle() }}
+        </h2>
+       </div>
+
+      <div class="flex items-center gap-3">
+          <button 
+              class="group inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 px-6 font-medium text-slate-700 shadow-sm transition-all hover:border-primary hover:text-primary active:scale-95"
+              (click)="refreshData()"
+          >
+              <mat-icon class="transition-transform group-hover:rotate-180">refresh</mat-icon>
+              <span>Refresh</span>
+          </button>
+
+          <button 
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary py-3 px-6 font-medium text-white shadow-lg shadow-primary/30 transition-all hover:bg-primary/90 hover:shadow-primary/50 active:scale-95 disabled:opacity-50 disabled:shadow-none"
+              (click)="exportData()"
+              [disabled]="!hasData()"
+          >
+              <mat-icon>download</mat-icon>
+              <span>Export</span>
+          </button>
+      </div>
+    </div>
+
+    <div class="space-y-8 animate-entry delay-200">
+
+        @if (hasFilters()) {
+          <div class="group relative overflow-hidden rounded-3xl bg-slate-50/80 border border-slate-100 p-6 transition-all hover:bg-slate-50 hover:shadow-md">
+            <div class="mb-6 flex items-center gap-3 border-b border-slate-200/60 pb-4">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-primary shadow-sm">
+                 <mat-icon>filter_list</mat-icon>
+              </div>
+              <h4 class="text-lg font-bold text-slate-800">filters</h4>
+            </div>
+
+            <app-smart-filter
+              [filters]="tab.filters"
+              (filterSubmit)="onSearch($event)"
+              (filterReset)="refreshData()"
+            ></app-smart-filter>
+          </div>
+        }
+
+        @if (hasData() || isTableLoading()) {
+          <div class="flex items-center justify-between rounded-2xl bg-white border border-slate-100 px-6 py-4 shadow-sm">
+              <div class="flex items-center gap-4">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                      <mat-icon>description</mat-icon>
+                  </div>
+                  <div>
+                      <span class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Records</span>
+                      <h3 class="text-xl font-black text-slate-900">{{ tableData().length }}</h3>
+                  </div>
+              </div>
+            
+          </div>
+        }
+
+        <div class="relative min-h-[300px] overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            
+            @if (isTableLoading()) {
+                <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm transition-opacity">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <span class="mt-3 text-sm font-medium text-slate-500"> Refreshing...</span>
+                </div>
+            }
+
+            <div class="overflow-x-auto">
+               <app-smart-table
+                  [columns]="tab.columns"
+                  [data]="tableData()"
+                  [isLoading]="isTableLoading()"
+                  (rowClick)="onRowClick($event)"
+                  (actionClick)="onActionClick($event)"
+              ></app-smart-table>
+            </div>
+
+            @if (!isTableLoading() && !hasData()) {
+                <div class="flex flex-col items-center py-20 text-center animate-fade">
+                    <div class="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-slate-50 text-slate-300">
+                        <mat-icon class="text-6xl h-16 w-16">search_off</mat-icon>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900">No data available</h3>
+    
+                    <button class="mt-8 flex items-center gap-2 rounded-xl bg-white border border-slate-200 py-2.5 px-6 font-medium text-primary shadow-sm hover:bg-slate-50 hover:border-primary/30 transition" (click)="refreshData()">
+                        <mat-icon>refresh</mat-icon>
+                       Reset Filter
+                    </button>
+                </div>
+            }
+        </div>
+
+    </div>
+  }
+
+</div>

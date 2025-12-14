@@ -1,0 +1,86 @@
+// Modern scrollbar
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+// Custom scrollbar for sidebar
+aside {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 10px;
+    
+    &:hover {
+      background: rgba(148, 163, 184, 0.5);
+    }
+  }
+}
+
+// Active link styles
+.active-link {
+  @apply bg-gradient-to-r from-primary/10 to-indigo-50 text-primary;
+  
+  div {
+    @apply bg-primary text-white shadow-lg;
+  }
+  
+  &::before {
+    content: '';
+    @apply absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r-full bg-primary;
+  }
+}
+
+.active-sublink {
+  @apply bg-primary/10 text-primary;
+  
+  div {
+    @apply border-primary bg-primary;
+  }
+}
+
+// Smooth transitions
+.nav-link {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Glass morphism effect
+.backdrop-blur-xl {
+  backdrop-filter: blur(20px);
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+// Shadow utilities
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+// Gradient text
+.gradient-text {
+  @apply bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent;
+}
