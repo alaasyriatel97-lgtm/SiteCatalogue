@@ -1,123 +1,123 @@
 <form [formGroup]="filterForm" (ngSubmit)="onSubmit()" class="filter-form">
   
-    <div class="filter-grid">
-      
-      @for (filter of filters; track filter.id) {
-        <div class="filter-field">
-          
-          <!-- Text Input -->
-          @if (filter.type === 'text') {
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>{{ filter.label }}</mat-label>
-              <input 
-                matInput 
-                [formControlName]="filter.key"
-                [placeholder]="filter.placeholder || ''"
-              >
-              <mat-icon matPrefix>search</mat-icon>
-              @if (filter.isRequired) {
-                <mat-icon matSuffix class="required-icon">star</mat-icon>
+  <div class="filter-grid">
+    
+    @for (filter of filters; track filter.id) {
+      <div class="filter-field">
+        
+        <!-- Text Input -->
+        @if (filter.type === 'text') {
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input 
+              matInput 
+              [formControlName]="filter.key"
+              [placeholder]="filter.placeholder || ''"
+            >
+            <mat-icon matPrefix>search</mat-icon>
+            @if (filter.isRequired) {
+              <mat-icon matSuffix class="required-icon">star</mat-icon>
+            }
+            @if (hasError(filter.key)) {
+              <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        
+        <!-- Number Input -->
+        @if (filter.type === 'number') {
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input 
+              matInput 
+              type="number"
+              [formControlName]="filter.key"
+              [placeholder]="filter.placeholder || ''"
+            >
+            <mat-icon matPrefix>pin</mat-icon>
+            @if (filter.isRequired) {
+              <mat-icon matSuffix class="required-icon">star</mat-icon>
+            }
+            @if (hasError(filter.key)) {
+              <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        
+        <!-- Date Input -->
+        @if (filter.type === 'date') {
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>{{ filter.label }}</mat-label>
+            <input 
+              matInput 
+              [matDatepicker]="picker"
+              [formControlName]="filter.key"
+            >
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            @if (filter.isRequired) {
+              <mat-icon matPrefix class="required-icon">star</mat-icon>
+            }
+            @if (hasError(filter.key)) {
+              <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        
+        <!-- Select Input -->
+        @if (filter.type === 'select') {
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>{{ filter.label }}</mat-label>
+            <mat-select [formControlName]="filter.key">
+              <mat-option value="">All</mat-option>
+              @for (option of getSelectOptions(filter); track option) {
+                <mat-option [value]="option">{{ option }}</mat-option>
               }
-              @if (hasError(filter.key)) {
-                <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
-              }
-            </mat-form-field>
-          }
-          
-          <!-- Number Input -->
-          @if (filter.type === 'number') {
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>{{ filter.label }}</mat-label>
-              <input 
-                matInput 
-                type="number"
-                [formControlName]="filter.key"
-                [placeholder]="filter.placeholder || ''"
-              >
-              <mat-icon matPrefix>pin</mat-icon>
-              @if (filter.isRequired) {
-                <mat-icon matSuffix class="required-icon">star</mat-icon>
-              }
-              @if (hasError(filter.key)) {
-                <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
-              }
-            </mat-form-field>
-          }
-          
-          <!-- Date Input -->
-          @if (filter.type === 'date') {
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>{{ filter.label }}</mat-label>
-              <input 
-                matInput 
-                [matDatepicker]="picker"
-                [formControlName]="filter.key"
-              >
-              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-              @if (filter.isRequired) {
-                <mat-icon matPrefix class="required-icon">star</mat-icon>
-              }
-              @if (hasError(filter.key)) {
-                <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
-              }
-            </mat-form-field>
-          }
-          
-          <!-- Select Input -->
-          @if (filter.type === 'select') {
-            <mat-form-field appearance="outline" class="w-full">
-              <mat-label>{{ filter.label }}</mat-label>
-              <mat-select [formControlName]="filter.key">
-                <mat-option value="">الكل</mat-option>
-                @for (option of getSelectOptions(filter); track option) {
-                  <mat-option [value]="option">{{ option }}</mat-option>
-                }
-              </mat-select>
-              @if (filter.isRequired) {
-                <mat-icon matSuffix class="required-icon">star</mat-icon>
-              }
-              @if (hasError(filter.key)) {
-                <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
-              }
-            </mat-form-field>
-          }
-          
-          <!-- Boolean Input -->
-          @if (filter.type === 'boolean') {
-            <mat-checkbox [formControlName]="filter.key" class="filter-checkbox">
-              {{ filter.label }}
-              @if (filter.isRequired) {
-                <mat-icon class="required-icon-inline">star</mat-icon>
-              }
-            </mat-checkbox>
-          }
-          
-        </div>
-      }
-      
-    </div>
-  
-    <!-- Action Buttons -->
-    <div class="filter-actions">
-      <button 
-        mat-raised-button 
-        color="primary"
-        type="submit"
-        [disabled]="filterForm.invalid"
-      >
-        <mat-icon>search</mat-icon>
-        بحث
-      </button>
-      
-      <button 
-        mat-stroked-button
-        type="button"
-        (click)="onReset()"
-      >
-        <mat-icon>clear</mat-icon>
-        إعادة تعيين
-      </button>
-    </div>
-  
-  </form>
+            </mat-select>
+            @if (filter.isRequired) {
+              <mat-icon matSuffix class="required-icon">star</mat-icon>
+            }
+            @if (hasError(filter.key)) {
+              <mat-error>{{ getErrorMessage(filter.key) }}</mat-error>
+            }
+          </mat-form-field>
+        }
+        
+        <!-- Boolean Input -->
+        @if (filter.type === 'boolean') {
+          <mat-checkbox [formControlName]="filter.key" class="filter-checkbox">
+            {{ filter.label }}
+            @if (filter.isRequired) {
+              <mat-icon class="required-icon-inline">star</mat-icon>
+            }
+          </mat-checkbox>
+        }
+        
+      </div>
+    }
+    
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="filter-actions">
+    <button 
+      mat-raised-button 
+      color="primary"
+      type="submit"
+      [disabled]="filterForm.invalid"
+    >
+      <mat-icon>search</mat-icon>
+      Search
+    </button>
+    
+    <button 
+      mat-stroked-button
+      type="button"
+      (click)="onReset()"
+    >
+      <mat-icon>clear</mat-icon>
+      Reset
+    </button>
+  </div>
+
+</form>

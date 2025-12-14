@@ -3,7 +3,7 @@
   @if (isLoading()) {
     <div class="flex h-50 flex-col items-center justify-center rounded-sm border border-stroke bg-white shadow-default">
       <mat-spinner diameter="50"></mat-spinner>
-      <p class="mt-4 text-body font-medium">جاري تحميل التقرير...</p>
+      <p class="mt-4 text-body font-medium">Loading report...</p>
     </div>
   }
 
@@ -13,11 +13,11 @@
           <div class="mb-4 rounded-full bg-red-50 p-4 text-red-500">
               <mat-icon class="text-4xl h-10 w-10">error_outline</mat-icon>
           </div>
-          <h3 class="mb-2 text-xl font-bold text-black">خطأ في تحميل التقرير</h3>
+          <h3 class="mb-2 text-xl font-bold text-black">Error loading report</h3>
           <p class="mb-6 font-medium text-body">{{ error() }}</p>
           <button class="flex items-center gap-2 rounded bg-primary py-2 px-6 font-medium text-white hover:bg-opacity-90" (click)="retry()">
             <mat-icon>refresh</mat-icon>
-            إعادة المحاولة
+            Retry
           </button>
         </div>
     </div>
@@ -30,7 +30,7 @@
         <h2 class="text-title-md2 font-bold text-black">
           {{ pageTitle() }}
         </h2>
-        <p class="text-sm font-medium text-body">تقرير ديناميكي متقدم</p>
+        <p class="text-sm font-medium text-body">Advanced Dynamic Report</p>
       </div>
 
       <div class="flex items-center gap-2">
@@ -40,14 +40,14 @@
               [disabled]="!hasData()"
           >
               <mat-icon class="text-white">download</mat-icon>
-              <span>تصدير</span>
+              <span>Export</span>
           </button>
           <button 
               class="inline-flex items-center justify-center gap-2.5 rounded-md border border-primary py-2 px-6 text-center font-medium text-primary hover:bg-opacity-90 hover:text-white hover:bg-primary transition"
               (click)="refreshData()"
           >
               <mat-icon>refresh</mat-icon>
-              <span>تحديث</span>
+              <span>Refresh</span>
           </button>
       </div>
     </div>
@@ -85,7 +85,7 @@
                   <div class="mb-6 rounded-sm border border-stroke bg-gray-50 p-5">
                       <h4 class="mb-4 flex items-center gap-2 text-lg font-semibold text-black">
                           <mat-icon class="text-primary">filter_list</mat-icon>
-                          فلاتر البحث
+                          Search Filters
                       </h4>
                       
                       <app-smart-filter
@@ -103,13 +103,13 @@
                               <mat-icon>description</mat-icon>
                           </div>
                           <div>
-                              <span class="block text-sm font-medium text-body">إجمالي النتائج</span>
+                              <span class="block text-sm font-medium text-body">Total Results</span>
                               <h3 class="text-xl font-bold text-black">{{ tableData().length }}</h3>
                           </div>
                       </div>
                       @if (lastUpdateTime()) {
                           <span class="text-sm font-medium text-body">
-                              آخر تحديث: {{ lastUpdateTime() | date:'shortTime' }}
+                              Last updated: {{ lastUpdateTime() | date:'shortTime' }}
                           </span>
                       }
                   </div>
@@ -135,11 +135,11 @@
                           <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 text-body">
                               <mat-icon class="text-5xl h-12 w-12">search_off</mat-icon>
                           </div>
-                          <h3 class="text-xl font-bold text-black">لا توجد بيانات</h3>
-                          <p class="mt-2 text-body">لم يتم العثور على أي سجلات. حاول تغيير خيارات البحث.</p>
+                          <h3 class="text-xl font-bold text-black">No Data Available</h3>
+                          <p class="mt-2 text-body">No records found. Try adjusting the search filters.</p>
                           <button class="mt-6 flex items-center gap-2 rounded border border-primary py-2 px-6 font-medium text-primary hover:bg-primary hover:text-white transition" (click)="refreshData()">
                               <mat-icon>refresh</mat-icon>
-                              تحديث البيانات
+                              Refresh Data
                           </button>
                       </div>
                   }
